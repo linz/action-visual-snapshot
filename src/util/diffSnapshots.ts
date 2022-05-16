@@ -144,12 +144,9 @@ export async function diffSnapshots({
   // This is to make sure we run the above tasks serially, otherwise we will
   // face OOM issues
   for (const absoluteFile of currentFiles) {
-    console.log('Diff', {absoluteFile});
     const file = path.relative(currentPath, absoluteFile);
-    const fileSpan = span?.startChild({
-      op: 'diff snapshot',
-      description: file,
-    });
+    console.log('Diff', {absoluteFile, file});
+
     currentSnapshots.add(file);
 
     if (baseSnapshots.has(file)) {
@@ -198,7 +195,7 @@ export async function diffSnapshots({
       newSnapshots.add(file);
     }
 
-    fileSpan?.finish();
+    console.log('DiffDone', {absoluteFile, file});
   }
 
   // TODO: Track cases where snapshot exists in `mergeBaseSnapshots`, but not
