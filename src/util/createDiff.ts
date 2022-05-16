@@ -19,6 +19,7 @@ export async function createDiff(
 ) {
   const {result, diff} = await getDiff(file1, file2, pixelmatchOptions);
 
+  console.log({snapshotName, output, result});
   if (result > 0) {
     await fs.writeFile(
       path.resolve(output, snapshotName),
