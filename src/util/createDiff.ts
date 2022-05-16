@@ -21,6 +21,7 @@ export async function createDiff(
 
   console.log({snapshotName, output, result});
   if (result > 0) {
+    await fs.mkdir(output, {recursive: true});
     await fs.writeFile(
       path.resolve(output, snapshotName),
       PNG.sync.write(diff)
