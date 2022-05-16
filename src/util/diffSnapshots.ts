@@ -127,7 +127,8 @@ export async function diffSnapshots({
       try {
         await io.mkdirP(path.resolve(base, childPath));
       } catch (err) {
-        Sentry.captureException(new Error(err.message));
+        console.log(err);
+        // Sentry.captureException(new Error(err.message));
       }
     }
   }

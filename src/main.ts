@@ -58,7 +58,8 @@ core.debug = (message: string) => {
 };
 
 function handleError(error: Error) {
-  Sentry.captureException(error);
+  // Sentry.captureException(error);
+  console.log(error);
   core.setFailed(error.message);
 }
 

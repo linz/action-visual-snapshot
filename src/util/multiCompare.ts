@@ -1,13 +1,10 @@
+import {PixelmatchOptions} from '@app/types';
 import {promises as fs} from 'fs';
 import path from 'path';
 import {PNG} from 'pngjs';
-import * as Sentry from '@sentry/node';
-
-import {PixelmatchOptions} from '@app/types';
-
-import {findChangedPixels} from './findChangedPixels';
-import {fileToPng} from './fileToPng';
 import {copyPixel} from './copyPixel';
+import {fileToPng} from './fileToPng';
+import {findChangedPixels} from './findChangedPixels';
 import {getDiff} from './getDiff';
 
 type Options = {
@@ -72,7 +69,8 @@ export async function multiCompare({
     }
   } catch (err) {
     // Can't 3-way compare
-    Sentry.captureException(err);
+    // Sentry.captureException(err);
+    console.log(err);
   }
 
   const {result, diff} = await getDiff(
