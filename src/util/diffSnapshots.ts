@@ -170,7 +170,13 @@ export async function diffSnapshots({
             pixelmatchOptions,
           });
         } else {
-          console.log('CreateDiff');
+          console.log('CreateDiff', {
+            file,
+            outputDiffPath,
+            baseHead,
+            branchHead,
+            pixelmatchOptions,
+          });
           isDiff = await createDiff(
             file,
             outputDiffPath,
