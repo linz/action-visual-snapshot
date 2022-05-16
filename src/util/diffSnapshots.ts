@@ -10,6 +10,7 @@ import {PixelmatchOptions} from '@app/types';
 import {createDiff} from './createDiff';
 import {multiCompare} from './multiCompare';
 import {getChildDirectories} from './getChildDirectories';
+import {promises as fs} from 'fs';
 
 const pngGlob = '/**/*.png';
 
@@ -128,8 +129,12 @@ export async function diffSnapshots({
     outputNewPath,
     outputMissingPath,
   ]) {
+    console.log('Mkdir', {base});
+
+    await fs.mkdir(base, {recursive: true});
+
     for (const childPath of [...childPaths]) {
-      console.log('MkDir', path.resolve(base, childPath));
+      console.log('Mkdir', path.resolve(base, childPath));
 
       try {
         await io.mkdirP(path.resolve(base, childPath));
