@@ -158,6 +158,8 @@ export async function diffSnapshots({
 
         // If merge base snapshot exists, do a 3way diff
         if (mergeBaseSnapshots.has(file)) {
+          console.log('CreateDiff:3way');
+
           isDiff = await multiCompare({
             branchBase: path.resolve(mergeBasePath, file),
             baseHead,
@@ -168,6 +170,7 @@ export async function diffSnapshots({
             pixelmatchOptions,
           });
         } else {
+          console.log('CreateDiff');
           isDiff = await createDiff(
             file,
             outputDiffPath,
@@ -178,6 +181,7 @@ export async function diffSnapshots({
         }
 
         if (isDiff) {
+          console.log('isDiff', isDiff);
           changedSnapshots.add(file);
           // Copy original + new files to results/output dirs
           await Promise.all([
