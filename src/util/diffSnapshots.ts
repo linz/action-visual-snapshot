@@ -77,6 +77,11 @@ export async function diffSnapshots({
     mergeBaseGlobber.glob(),
   ]);
 
+  console.log({
+    baseFiles,
+    currentFiles,
+    mergeBaseFiles,
+  });
   if (!baseFiles.length) {
     core.warning('No snapshots found for base branch');
   }
@@ -124,10 +129,12 @@ export async function diffSnapshots({
     outputMissingPath,
   ]) {
     for (const childPath of [...childPaths]) {
+      console.log('MkDir', path.resolve(base, childPath));
+
       try {
         await io.mkdirP(path.resolve(base, childPath));
       } catch (err) {
-        console.log(err);
+        console.trace(err);
         // Sentry.captureException(new Error(err.message));
       }
     }
@@ -137,6 +144,7 @@ export async function diffSnapshots({
   // This is to make sure we run the above tasks serially, otherwise we will
   // face OOM issues
   for (const absoluteFile of currentFiles) {
+    console.log('Diff', {absoluteFile});
     const file = path.relative(currentPath, absoluteFile);
     const fileSpan = span?.startChild({
       op: 'diff snapshot',

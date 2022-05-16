@@ -59,7 +59,7 @@ core.debug = (message: string) => {
 
 function handleError(error: Error) {
   // Sentry.captureException(error);
-  console.log(error);
+  console.trace(error);
   core.setFailed(error.message);
 }
 
