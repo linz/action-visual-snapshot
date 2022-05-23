@@ -265,7 +265,8 @@ async function run(): Promise<void> {
 
     await fsa.write(
       fsa.join(storagePrefix, `${gcsDestination}/index.html`),
-      fsa.stream(path.resolve(resultsPath, 'index.html'))
+      fsa.stream(path.resolve(resultsPath, 'index.html')),
+      {contentType: 'text/html'}
     );
     const galleryUrl = fsa.join(publicUrl, `${gcsDestination}/index.html`);
     // core.endGroup();

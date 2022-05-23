@@ -14,10 +14,8 @@ type Params = {
 
 export async function startBuild(opt: Params): Promise<any> {
   core.startGroup('Starting build using GitHub API directly...');
-  console.log(
-    'CreateCheck',
-    `${opt.owner}/${opt.repo}#${opt.headSha}`,
-    opt.name
+  core.info(
+    `CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`
   );
   const {data: check} = await opt.octokit.checks.create({
     owner: opt.owner,

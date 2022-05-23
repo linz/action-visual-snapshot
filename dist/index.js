@@ -266,10 +266,10 @@ var require_core = __commonJS({
       command_1.issue("warning", message instanceof Error ? message.toString() : message);
     }
     exports.warning = warning4;
-    function info(message) {
+    function info2(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info;
+    exports.info = info2;
     function startGroup8(name) {
       command_1.issue("group", name);
     }
@@ -822,12 +822,12 @@ var require_http_client = __commonJS({
           throw new Error("Client has already been disposed.");
         }
         let parsedUrl = url.parse(requestUrl);
-        let info = this._prepareRequest(verb, parsedUrl, headers);
+        let info2 = this._prepareRequest(verb, parsedUrl, headers);
         let maxTries = this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1 ? this._maxRetries + 1 : 1;
         let numTries = 0;
         let response;
         while (numTries < maxTries) {
-          response = await this.requestRaw(info, data);
+          response = await this.requestRaw(info2, data);
           if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
             let authenticationHandler;
             for (let i2 = 0; i2 < this.handlers.length; i2++) {
@@ -837,7 +837,7 @@ var require_http_client = __commonJS({
               }
             }
             if (authenticationHandler) {
-              return authenticationHandler.handleAuthentication(this, info, data);
+              return authenticationHandler.handleAuthentication(this, info2, data);
             } else {
               return response;
             }
@@ -860,8 +860,8 @@ var require_http_client = __commonJS({
                 }
               }
             }
-            info = this._prepareRequest(verb, parsedRedirectUrl, headers);
-            response = await this.requestRaw(info, data);
+            info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+            response = await this.requestRaw(info2, data);
             redirectsRemaining--;
           }
           if (HttpResponseRetryCodes.indexOf(response.message.statusCode) == -1) {
@@ -881,7 +881,7 @@ var require_http_client = __commonJS({
         }
         this._disposed = true;
       }
-      requestRaw(info, data) {
+      requestRaw(info2, data) {
         return new Promise((resolve2, reject) => {
           let callbackForResult = function(err, res) {
             if (err) {
@@ -889,13 +889,13 @@ var require_http_client = __commonJS({
             }
             resolve2(res);
           };
-          this.requestRawWithCallback(info, data, callbackForResult);
+          this.requestRawWithCallback(info2, data, callbackForResult);
         });
       }
-      requestRawWithCallback(info, data, onResult) {
+      requestRawWithCallback(info2, data, onResult) {
         let socket;
         if (typeof data === "string") {
-          info.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         let handleResult = (err, res) => {
@@ -904,7 +904,7 @@ var require_http_client = __commonJS({
             onResult(err, res);
           }
         };
-        let req = info.httpModule.request(info.options, (msg) => {
+        let req = info2.httpModule.request(info2.options, (msg) => {
           let res = new HttpClientResponse(msg);
           handleResult(null, res);
         });
@@ -915,7 +915,7 @@ var require_http_client = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error("Request timeout: " + info.options.path), null);
+          handleResult(new Error("Request timeout: " + info2.options.path), null);
         });
         req.on("error", function(err) {
           handleResult(err, null);
@@ -937,27 +937,27 @@ var require_http_client = __commonJS({
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info = {};
-        info.parsedUrl = requestUrl;
-        const usingSsl = info.parsedUrl.protocol === "https:";
-        info.httpModule = usingSsl ? https2 : http3;
+        const info2 = {};
+        info2.parsedUrl = requestUrl;
+        const usingSsl = info2.parsedUrl.protocol === "https:";
+        info2.httpModule = usingSsl ? https2 : http3;
         const defaultPort = usingSsl ? 443 : 80;
-        info.options = {};
-        info.options.host = info.parsedUrl.hostname;
-        info.options.port = info.parsedUrl.port ? parseInt(info.parsedUrl.port) : defaultPort;
-        info.options.path = (info.parsedUrl.pathname || "") + (info.parsedUrl.search || "");
-        info.options.method = method;
-        info.options.headers = this._mergeHeaders(headers);
+        info2.options = {};
+        info2.options.host = info2.parsedUrl.hostname;
+        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
+        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
+        info2.options.method = method;
+        info2.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info.options.headers["user-agent"] = this.userAgent;
+          info2.options.headers["user-agent"] = this.userAgent;
         }
-        info.options.agent = this._getAgent(info.parsedUrl);
+        info2.options.agent = this._getAgent(info2.parsedUrl);
         if (this.handlers) {
           this.handlers.forEach((handler) => {
-            handler.prepareRequest(info.options);
+            handler.prepareRequest(info2.options);
           });
         }
-        return info;
+        return info2;
       }
       _mergeHeaders(headers) {
         const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
@@ -1551,10 +1551,10 @@ var require_which = __commonJS({
         cb = opt;
         opt = {};
       }
-      var info = getPathInfo(cmd, opt);
-      var pathEnv = info.env;
-      var pathExt = info.ext;
-      var pathExtExe = info.extExe;
+      var info2 = getPathInfo(cmd, opt);
+      var pathEnv = info2.env;
+      var pathExt = info2.ext;
+      var pathExtExe = info2.extExe;
       var found = [];
       (function F2(i2, l) {
         if (i2 === l) {
@@ -1589,10 +1589,10 @@ var require_which = __commonJS({
     }
     function whichSync(cmd, opt) {
       opt = opt || {};
-      var info = getPathInfo(cmd, opt);
-      var pathEnv = info.env;
-      var pathExt = info.ext;
-      var pathExtExe = info.extExe;
+      var info2 = getPathInfo(cmd, opt);
+      var pathEnv = info2.env;
+      var pathExt = info2.ext;
+      var pathExtExe = info2.extExe;
       var found = [];
       for (var i2 = 0, l = pathEnv.length; i2 < l; i2++) {
         var pathPart = pathEnv[i2];
@@ -31327,22 +31327,22 @@ var require_managed_upload = __commonJS({
         data.Bucket = this.request.params.Bucket;
         upload.callback(err, data);
       },
-      progress: function progress(info) {
+      progress: function progress(info2) {
         var upload = this._managedUpload;
         if (this.operation === "putObject") {
-          info.part = 1;
-          info.key = this.params.Key;
+          info2.part = 1;
+          info2.key = this.params.Key;
         } else {
-          upload.totalUploadedBytes += info.loaded - this._lastUploadedBytes;
-          this._lastUploadedBytes = info.loaded;
-          info = {
+          upload.totalUploadedBytes += info2.loaded - this._lastUploadedBytes;
+          this._lastUploadedBytes = info2.loaded;
+          info2 = {
             loaded: upload.totalUploadedBytes,
             total: upload.totalBytes,
             part: this.params.PartNumber,
             key: this.params.Key
           };
         }
-        upload.emit("httpUploadProgress", [info]);
+        upload.emit("httpUploadProgress", [info2]);
       }
     });
     AWS2.util.mixin(AWS2.S3.ManagedUpload, AWS2.SequentialExecutor);
@@ -49217,7 +49217,7 @@ ${JSON.stringify(workflowRun, null, 2)}`);
 var core4 = __toESM(require_core());
 async function startBuild(opt) {
   core4.startGroup("Starting build using GitHub API directly...");
-  console.log("CreateCheck", `${opt.owner}/${opt.repo}#${opt.headSha}`, opt.name);
+  core4.info(`CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`);
   const { data: check } = await opt.octokit.checks.create({
     owner: opt.owner,
     repo: opt.repo,
@@ -49831,7 +49831,7 @@ async function run() {
     core9.endGroup();
     core9.startGroup("Generating image gallery...");
     await generateImageGallery(import_path8.default.resolve(resultsPath, "index.html"), results);
-    await fsa.write(fsa.join(storagePrefix, `${gcsDestination}/index.html`), fsa.stream(import_path8.default.resolve(resultsPath, "index.html")));
+    await fsa.write(fsa.join(storagePrefix, `${gcsDestination}/index.html`), fsa.stream(import_path8.default.resolve(resultsPath, "index.html")), { contentType: "text/html" });
     const galleryUrl = fsa.join(publicUrl, `${gcsDestination}/index.html`);
     core9.debug("Saving snapshots and finishing build...");
     await Promise.all([
