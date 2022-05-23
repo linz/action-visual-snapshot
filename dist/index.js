@@ -266,10 +266,10 @@ var require_core = __commonJS({
       command_1.issue("warning", message instanceof Error ? message.toString() : message);
     }
     exports.warning = warning4;
-    function info2(message) {
+    function info3(message) {
       process.stdout.write(message + os.EOL);
     }
-    exports.info = info2;
+    exports.info = info3;
     function startGroup8(name) {
       command_1.issue("group", name);
     }
@@ -822,12 +822,12 @@ var require_http_client = __commonJS({
           throw new Error("Client has already been disposed.");
         }
         let parsedUrl = url.parse(requestUrl);
-        let info2 = this._prepareRequest(verb, parsedUrl, headers);
+        let info3 = this._prepareRequest(verb, parsedUrl, headers);
         let maxTries = this._allowRetries && RetryableHttpVerbs.indexOf(verb) != -1 ? this._maxRetries + 1 : 1;
         let numTries = 0;
         let response;
         while (numTries < maxTries) {
-          response = await this.requestRaw(info2, data);
+          response = await this.requestRaw(info3, data);
           if (response && response.message && response.message.statusCode === HttpCodes.Unauthorized) {
             let authenticationHandler;
             for (let i2 = 0; i2 < this.handlers.length; i2++) {
@@ -837,7 +837,7 @@ var require_http_client = __commonJS({
               }
             }
             if (authenticationHandler) {
-              return authenticationHandler.handleAuthentication(this, info2, data);
+              return authenticationHandler.handleAuthentication(this, info3, data);
             } else {
               return response;
             }
@@ -860,8 +860,8 @@ var require_http_client = __commonJS({
                 }
               }
             }
-            info2 = this._prepareRequest(verb, parsedRedirectUrl, headers);
-            response = await this.requestRaw(info2, data);
+            info3 = this._prepareRequest(verb, parsedRedirectUrl, headers);
+            response = await this.requestRaw(info3, data);
             redirectsRemaining--;
           }
           if (HttpResponseRetryCodes.indexOf(response.message.statusCode) == -1) {
@@ -881,7 +881,7 @@ var require_http_client = __commonJS({
         }
         this._disposed = true;
       }
-      requestRaw(info2, data) {
+      requestRaw(info3, data) {
         return new Promise((resolve2, reject) => {
           let callbackForResult = function(err, res) {
             if (err) {
@@ -889,13 +889,13 @@ var require_http_client = __commonJS({
             }
             resolve2(res);
           };
-          this.requestRawWithCallback(info2, data, callbackForResult);
+          this.requestRawWithCallback(info3, data, callbackForResult);
         });
       }
-      requestRawWithCallback(info2, data, onResult) {
+      requestRawWithCallback(info3, data, onResult) {
         let socket;
         if (typeof data === "string") {
-          info2.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
+          info3.options.headers["Content-Length"] = Buffer.byteLength(data, "utf8");
         }
         let callbackCalled = false;
         let handleResult = (err, res) => {
@@ -904,7 +904,7 @@ var require_http_client = __commonJS({
             onResult(err, res);
           }
         };
-        let req = info2.httpModule.request(info2.options, (msg) => {
+        let req = info3.httpModule.request(info3.options, (msg) => {
           let res = new HttpClientResponse(msg);
           handleResult(null, res);
         });
@@ -915,7 +915,7 @@ var require_http_client = __commonJS({
           if (socket) {
             socket.end();
           }
-          handleResult(new Error("Request timeout: " + info2.options.path), null);
+          handleResult(new Error("Request timeout: " + info3.options.path), null);
         });
         req.on("error", function(err) {
           handleResult(err, null);
@@ -937,27 +937,27 @@ var require_http_client = __commonJS({
         return this._getAgent(parsedUrl);
       }
       _prepareRequest(method, requestUrl, headers) {
-        const info2 = {};
-        info2.parsedUrl = requestUrl;
-        const usingSsl = info2.parsedUrl.protocol === "https:";
-        info2.httpModule = usingSsl ? https2 : http3;
+        const info3 = {};
+        info3.parsedUrl = requestUrl;
+        const usingSsl = info3.parsedUrl.protocol === "https:";
+        info3.httpModule = usingSsl ? https2 : http3;
         const defaultPort = usingSsl ? 443 : 80;
-        info2.options = {};
-        info2.options.host = info2.parsedUrl.hostname;
-        info2.options.port = info2.parsedUrl.port ? parseInt(info2.parsedUrl.port) : defaultPort;
-        info2.options.path = (info2.parsedUrl.pathname || "") + (info2.parsedUrl.search || "");
-        info2.options.method = method;
-        info2.options.headers = this._mergeHeaders(headers);
+        info3.options = {};
+        info3.options.host = info3.parsedUrl.hostname;
+        info3.options.port = info3.parsedUrl.port ? parseInt(info3.parsedUrl.port) : defaultPort;
+        info3.options.path = (info3.parsedUrl.pathname || "") + (info3.parsedUrl.search || "");
+        info3.options.method = method;
+        info3.options.headers = this._mergeHeaders(headers);
         if (this.userAgent != null) {
-          info2.options.headers["user-agent"] = this.userAgent;
+          info3.options.headers["user-agent"] = this.userAgent;
         }
-        info2.options.agent = this._getAgent(info2.parsedUrl);
+        info3.options.agent = this._getAgent(info3.parsedUrl);
         if (this.handlers) {
           this.handlers.forEach((handler) => {
-            handler.prepareRequest(info2.options);
+            handler.prepareRequest(info3.options);
           });
         }
-        return info2;
+        return info3;
       }
       _mergeHeaders(headers) {
         const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => (c[k.toLowerCase()] = obj[k], c), {});
@@ -1551,10 +1551,10 @@ var require_which = __commonJS({
         cb = opt;
         opt = {};
       }
-      var info2 = getPathInfo(cmd, opt);
-      var pathEnv = info2.env;
-      var pathExt = info2.ext;
-      var pathExtExe = info2.extExe;
+      var info3 = getPathInfo(cmd, opt);
+      var pathEnv = info3.env;
+      var pathExt = info3.ext;
+      var pathExtExe = info3.extExe;
       var found = [];
       (function F2(i2, l) {
         if (i2 === l) {
@@ -1589,10 +1589,10 @@ var require_which = __commonJS({
     }
     function whichSync(cmd, opt) {
       opt = opt || {};
-      var info2 = getPathInfo(cmd, opt);
-      var pathEnv = info2.env;
-      var pathExt = info2.ext;
-      var pathExtExe = info2.extExe;
+      var info3 = getPathInfo(cmd, opt);
+      var pathEnv = info3.env;
+      var pathExt = info3.ext;
+      var pathExtExe = info3.extExe;
       var found = [];
       for (var i2 = 0, l = pathEnv.length; i2 < l; i2++) {
         var pathPart = pathEnv[i2];
@@ -31327,22 +31327,22 @@ var require_managed_upload = __commonJS({
         data.Bucket = this.request.params.Bucket;
         upload.callback(err, data);
       },
-      progress: function progress(info2) {
+      progress: function progress(info3) {
         var upload = this._managedUpload;
         if (this.operation === "putObject") {
-          info2.part = 1;
-          info2.key = this.params.Key;
+          info3.part = 1;
+          info3.key = this.params.Key;
         } else {
-          upload.totalUploadedBytes += info2.loaded - this._lastUploadedBytes;
-          this._lastUploadedBytes = info2.loaded;
-          info2 = {
+          upload.totalUploadedBytes += info3.loaded - this._lastUploadedBytes;
+          this._lastUploadedBytes = info3.loaded;
+          info3 = {
             loaded: upload.totalUploadedBytes,
             total: upload.totalBytes,
             part: this.params.PartNumber,
             key: this.params.Key
           };
         }
-        upload.emit("httpUploadProgress", [info2]);
+        upload.emit("httpUploadProgress", [info3]);
       }
     });
     AWS2.util.mixin(AWS2.S3.ManagedUpload, AWS2.SequentialExecutor);
@@ -49817,8 +49817,8 @@ async function run() {
       const relativeFilePath = import_path8.default.relative(resultsPath, file);
       const target = fsa.join(storagePrefix, `${gcsDestination}/results/${relativeFilePath}`);
       const imageUrl = fsa.join(publicUrl, `${gcsDestination}/results/${relativeFilePath}`);
-      console.log("Writing", { src: file, dest: target, public: imageUrl });
-      await fsa.write(target, fsa.stream(file));
+      core9.info(`Write source:${file} dest:${target} public: ${imageUrl}`);
+      await fsa.write(target, fsa.stream(file), { contentType: file.endsWith(".png") ? "image/png" : void 0 });
       return { image_url: imageUrl, alt: "" };
     }));
     const changedArray = [...changedSnapshots];
