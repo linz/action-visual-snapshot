@@ -49215,19 +49215,14 @@ ${JSON.stringify(workflowRun, null, 2)}`);
 
 // src/api/startBuild.ts
 var core4 = __toESM(require_core());
-async function startBuild({
-  octokit: octokit2,
-  owner: owner2,
-  repo: repo2,
-  headSha: head_sha,
-  name = "Visual Snapshot"
-}) {
+async function startBuild(opt) {
   core4.startGroup("Starting build using GitHub API directly...");
-  const { data: check } = await octokit2.checks.create({
-    owner: owner2,
-    repo: repo2,
-    head_sha,
-    name,
+  console.log("CreateCheck", `${opt.owner}/${opt.repo}#${opt.headSha}`, opt.name);
+  const { data: check } = await opt.octokit.checks.create({
+    owner: opt.owner,
+    repo: opt.repo,
+    head_sha: opt.headSha,
+    name: opt.name,
     status: "in_progress"
   });
   core4.endGroup();

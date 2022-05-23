@@ -12,19 +12,18 @@ type Params = {
   name: string;
 };
 
-export async function startBuild({
-  octokit,
-  owner,
-  repo,
-  headSha: head_sha,
-  name = 'Visual Snapshot',
-}: Params): Promise<any> {
+export async function startBuild(opt: Params): Promise<any> {
   core.startGroup('Starting build using GitHub API directly...');
-  const {data: check} = await octokit.checks.create({
-    owner,
-    repo,
-    head_sha,
-    name,
+  console.log(
+    'CreateCheck',
+    `${opt.owner}/${opt.repo}#${opt.headSha}`,
+    opt.name
+  );
+  const {data: check} = await opt.octokit.checks.create({
+    owner: opt.owner,
+    repo: opt.repo,
+    head_sha: opt.headSha,
+    name: opt.name,
     status: 'in_progress',
   });
   core.endGroup();
