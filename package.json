@@ -11,7 +11,7 @@
     "format": "yarn prettier --write **/*.ts",
     "format-check": "yarn prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "dist": "yarn build-template && yarn build && yarn ncc build -C -s",
+    "dist": "yarn build-template && yarn build && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
     "test": "yarn jest",
     "all": "yarn build && yarn format && yarn lint && yarn test && yarn dist"
   },
@@ -73,7 +73,7 @@
     "@types/node": "^14.0.14",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
-    "@vercel/ncc": "^0.33.3",
+    "esbuild": "^0.14.39",
     "eslint": "^7.10.0",
     "eslint-config-sentry": "^1.44.0",
     "eslint-plugin-jest": "^24.1.0",

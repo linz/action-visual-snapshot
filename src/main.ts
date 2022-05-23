@@ -26,13 +26,6 @@ const {GITHUB_WORKSPACE, GITHUB_WORKFLOW} = process.env;
 const pngGlob = '/**/*.png';
 const shouldSaveOnly = core.getInput('save-only');
 
-const originalCoreDebug = core.debug;
-
-// @ts-ignore
-core.debug = (message: string) => {
-  originalCoreDebug(message);
-};
-
 function handleError(error: Error) {
   // Sentry.captureException(error);
   console.trace(error);
