@@ -59,12 +59,9 @@ inputs:
     description: 'The name to be displayed in GitHub Checks'
     default: 'Visual Snapshot'
 
-  gcp-service-account-key:
-    required: false
-    description: 'Google Cloud service account key (base64)'
-  gcs-bucket:
+  storage-prefix:
     require: false
-    description: 'if this is set, upload to google cloud storage'
+    description: 'if this is set, upload to cloud storage'
 outputs:
   results-path:
     description: 'path where results are saved'

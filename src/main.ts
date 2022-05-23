@@ -3,6 +3,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
+import {fsa} from '@chunkd/fs';
 import path from 'path';
 import {downloadOtherWorkflowArtifact} from './api/downloadOtherWorkflowArtifact';
 import {failBuild} from './api/failBuild';
@@ -14,9 +15,9 @@ import {Await} from './types';
 import {diffSnapshots} from './util/diffSnapshots';
 import {downloadSnapshots} from './util/downloadSnapshots';
 import {generateImageGallery} from './util/generateImageGallery';
-import {getStorageClient} from './util/getStorageClient';
 import {saveSnapshots} from './util/saveSnapshots';
-import {uploadToGcs} from './util/uploadToGcs';
+
+fsa.list('s3://linz-basemaps');
 
 const {owner, repo} = github.context.repo;
 const token = core.getInput('github-token');
@@ -42,8 +43,9 @@ async function run(): Promise<void> {
   const resultsRootPath: string = core.getInput('results-path');
   const baseBranch = core.getInput('base-branch');
   const artifactName = core.getInput('artifact-name');
-  const gcsBucket = core.getInput('gcs-bucket');
+  const storagePrefix = core.getInput('storage-prefix');
   const actionName = core.getInput('action-name');
+  const publicUrl = core.getInput('gallery-url');
   const snapshotPath: string = core.getInput('snapshot-path');
 
   const resultsPath = path.resolve(resultsRootPath, 'visual-snapshots-results');
@@ -232,12 +234,26 @@ async function run(): Promise<void> {
     const resultsFiles = await resultsGlobber.glob();
 
     const gcsDestination = `${owner}/${repo}/${headSha}`;
-    const resultsArtifactUrls = await uploadToGcs({
-      files: resultsFiles,
-      root: resultsPath,
-      bucket: gcsBucket,
-      destinationRoot: `${gcsDestination}/results`,
-    });
+
+    const resultsArtifactUrls = await Promise.all(
+      resultsFiles.map(async file => {
+        const relativeFilePath = path.relative(resultsPath, file);
+
+        const target = fsa.join(
+          storagePrefix,
+          `${gcsDestination}/results/${relativeFilePath}`
+        );
+        const imageUrl = fsa.join(
+          publicUrl,
+          `${gcsDestination}/results/${relativeFilePath}`
+        );
+        console.log('Writing', {src: file, dest: target, public: imageUrl});
+
+        await fsa.write(target, fsa.stream(file));
+        return {image_url: imageUrl, alt: ''};
+      })
+    );
+
     const changedArray = [...changedSnapshots];
     const results = {
       baseFilesLength: baseFiles.length,
@@ -253,23 +269,12 @@ async function run(): Promise<void> {
       results
     );
 
-    const storage = getStorageClient();
-    const [imageGalleryFile] = storage
-      ? await storage
-          .bucket(gcsBucket)
-          .upload(path.resolve(resultsPath, 'index.html'), {
-            destination: `${gcsDestination}/index.html`,
-            gzip: true,
-            metadata: {
-              cacheControl: 'public, max-age=31536000',
-            },
-          })
-      : [];
-
-    const galleryUrl =
-      imageGalleryFile &&
-      `https://storage.googleapis.com/${gcsBucket}/${imageGalleryFile.name}`;
-    core.endGroup();
+    await fsa.write(
+      fsa.join(storagePrefix, `${gcsDestination}/index.html`),
+      fsa.stream(path.resolve(resultsPath, 'index.html'))
+    );
+    const galleryUrl = fsa.join(publicUrl, `${gcsDestination}/index.html`);
+    // core.endGroup();
 
     core.debug('Saving snapshots and finishing build...');
     await Promise.all([
@@ -283,7 +288,6 @@ async function run(): Promise<void> {
         id: buildId,
         owner,
         repo,
-
         galleryUrl,
         images: resultsArtifactUrls,
         headSha,
