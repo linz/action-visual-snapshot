@@ -1,26 +1,22 @@
 /* eslint-env node */
-import path from 'path';
 import * as core from '@actions/core';
-import * as glob from '@actions/glob';
 import * as github from '@actions/github';
+import * as glob from '@actions/glob';
 import * as io from '@actions/io';
-import * as Sentry from '@sentry/node';
-import {RewriteFrames} from '@sentry/integrations';
-
-import {generateImageGallery} from './util/generateImageGallery';
-import {saveSnapshots} from './util/saveSnapshots';
-import {downloadSnapshots} from './util/downloadSnapshots';
-import {uploadToGcs} from './util/uploadToGcs';
-import {getStorageClient} from './util/getStorageClient';
-import {diffSnapshots} from './util/diffSnapshots';
+import path from 'path';
+import {downloadOtherWorkflowArtifact} from './api/downloadOtherWorkflowArtifact';
+import {failBuild} from './api/failBuild';
+import {finishBuild} from './api/finishBuild';
 import {retrieveBaseSnapshots} from './api/retrieveBaseSnapshots';
 import {startBuild} from './api/startBuild';
-import {finishBuild} from './api/finishBuild';
-import {failBuild} from './api/failBuild';
-import {SENTRY_DSN} from './config';
-import {Await} from './types';
 import {getPixelmatchOptions} from './getPixelmatchOptions';
-import {downloadOtherWorkflowArtifact} from './api/downloadOtherWorkflowArtifact';
+import {Await} from './types';
+import {diffSnapshots} from './util/diffSnapshots';
+import {downloadSnapshots} from './util/downloadSnapshots';
+import {generateImageGallery} from './util/generateImageGallery';
+import {getStorageClient} from './util/getStorageClient';
+import {saveSnapshots} from './util/saveSnapshots';
+import {uploadToGcs} from './util/uploadToGcs';
 
 const {owner, repo} = github.context.repo;
 const token = core.getInput('github-token');
@@ -29,31 +25,10 @@ const {GITHUB_WORKSPACE, GITHUB_WORKFLOW} = process.env;
 const pngGlob = '/**/*.png';
 const shouldSaveOnly = core.getInput('save-only');
 
-Sentry.init({
-  dsn: SENTRY_DSN,
-  integrations: [
-    new RewriteFrames({root: __dirname || process.cwd()}),
-    new Sentry.Integrations.Http({tracing: true}),
-  ],
-  release: process.env.VERSION,
-  tracesSampleRate: 1.0,
-});
-
-Sentry.setContext('actionEnvironment', {
-  repo: process.env.GITHUB_REPOSITORY,
-  ref: process.env.GITHUB_REF,
-  head_ref: process.env.GITHUB_HEAD_REF,
-});
-
 const originalCoreDebug = core.debug;
 
 // @ts-ignore
 core.debug = (message: string) => {
-  Sentry.addBreadcrumb({
-    category: 'console',
-    message,
-    level: Sentry.Severity.Debug,
-  });
   originalCoreDebug(message);
 };
 
@@ -68,7 +43,6 @@ async function run(): Promise<void> {
   const baseBranch = core.getInput('base-branch');
   const artifactName = core.getInput('artifact-name');
   const gcsBucket = core.getInput('gcs-bucket');
-  const apiToken = core.getInput('api-token');
   const actionName = core.getInput('action-name');
   const snapshotPath: string = core.getInput('snapshot-path');
 
@@ -145,7 +119,7 @@ async function run(): Promise<void> {
     octokit,
     owner,
     repo,
-    token: apiToken,
+
     headSha,
     headRef,
     name: actionName,
@@ -257,11 +231,6 @@ async function run(): Promise<void> {
     });
     const resultsFiles = await resultsGlobber.glob();
 
-    const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
-    const gcsSpan = transaction?.startChild({
-      op: 'upload',
-      description: 'Upload to GCS',
-    });
     const gcsDestination = `${owner}/${repo}/${headSha}`;
     const resultsArtifactUrls = await uploadToGcs({
       files: resultsFiles,
@@ -269,7 +238,6 @@ async function run(): Promise<void> {
       bucket: gcsBucket,
       destinationRoot: `${gcsDestination}/results`,
     });
-    gcsSpan?.finish();
     const changedArray = [...changedSnapshots];
     const results = {
       baseFilesLength: baseFiles.length,
@@ -303,10 +271,6 @@ async function run(): Promise<void> {
       `https://storage.googleapis.com/${gcsBucket}/${imageGalleryFile.name}`;
     core.endGroup();
 
-    const finishSpan = transaction?.startChild({
-      op: 'finishing',
-      description: 'Save snapshots and finish build',
-    });
     core.debug('Saving snapshots and finishing build...');
     await Promise.all([
       saveSnapshots({
@@ -319,14 +283,13 @@ async function run(): Promise<void> {
         id: buildId,
         owner,
         repo,
-        token: apiToken,
+
         galleryUrl,
         images: resultsArtifactUrls,
         headSha,
         results,
       }),
     ]);
-    finishSpan?.finish();
   } catch (error) {
     handleError(error);
     failBuild({
@@ -335,18 +298,8 @@ async function run(): Promise<void> {
       owner,
       repo,
       headSha,
-      token: apiToken,
     });
   }
 }
 
-const transaction = Sentry.startTransaction({
-  op: shouldSaveOnly !== 'false' ? 'save snapshots' : 'run',
-  name: 'visual snapshot',
-});
-
-Sentry.configureScope(scope => {
-  scope.setSpan(transaction);
-});
-
-run().then(() => transaction.finish());
+run();

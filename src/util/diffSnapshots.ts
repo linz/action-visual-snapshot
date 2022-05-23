@@ -3,7 +3,6 @@ import path from 'path';
 import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
-import * as Sentry from '@sentry/node';
 
 import {PixelmatchOptions} from '@app/types';
 
@@ -52,12 +51,6 @@ export async function diffSnapshots({
   missingDirName = 'missing',
   pixelmatchOptions,
 }: DiffSnapshotsParams) {
-  const transaction = Sentry.getCurrentHub().getScope()?.getTransaction();
-  const span = transaction?.startChild({
-    op: 'diff snapshots',
-    description: 'diff snapshots',
-  });
-
   const newSnapshots = new Set<string>([]);
   const changedSnapshots = new Set<string>([]);
   const missingSnapshots = new Set<string>([]);
@@ -256,7 +249,6 @@ export async function diffSnapshots({
     )
   );
 
-  span?.finish();
   return {
     baseFiles,
     missingSnapshots,
