@@ -1,74 +1,78 @@
-name: 'action-visual-snapshot'
-description: 'Visual snapshot tester for GitHub Actions'
-author: 'Sentry'
+name: "action-visual-snapshot"
+description: "Visual snapshot tester for GitHub Actions"
+author: "Sentry"
 inputs:
   threshold:
-    description: 'Matching threshold, ranges from 0 to 1. Smaller values make the comparison more sensitive. 0.1 by default.'
+    description: "Matching threshold, ranges from 0 to 1. Smaller values make the comparison more sensitive. 0.1 by default."
     default: 0.05
     required: false
   includeAA:
-    description: 'If true, disables detecting and ignoring anti-aliased pixels. false by default.'
+    description: "If true, disables detecting and ignoring anti-aliased pixels. false by default."
     default: false
     required: false
   alpha:
-    description: 'Blending factor of unchanged pixels in the diff output. Ranges from 0 for pure white to 1 for original brightness. 0.1 by default.'
+    description: "Blending factor of unchanged pixels in the diff output. Ranges from 0 for pure white to 1 for original brightness. 0.1 by default."
     default: 0.1
     required: false
   diffMask:
-    description: 'Draw the diff over a transparent background (a mask), rather than over the original image. Will not draw anti-aliased pixels (if detected).'
+    description: "Draw the diff over a transparent background (a mask), rather than over the original image. Will not draw anti-aliased pixels (if detected)."
     required: false
 
   snapshot-path:
     required: false
-    description: 'path where snapshots are saved'
+    description: "path where snapshots are saved"
   merge-base:
     required: false
-    description: 'the merge base sha, will use from github context otherwise. If you use `pull_request_target` you will need to supply the merge base.'
+    description: "the merge base sha, will use from github context otherwise. If you use `pull_request_target` you will need to supply the merge base."
 
   api-token:
     required: true
-    description: 'Visual Snapshot API token, should be `VISUAL_SNAPSHOT_SECRET` from GitHub Secrets'
-  
+    description: "Visual Snapshot API token, should be `VISUAL_SNAPSHOT_SECRET` from GitHub Secrets"
+
   github-token:
     required: false
-    description: 'github token'
-    default: '${{ github.token }}'
+    description: "github token"
+    default: "${{ github.token }}"
 
   results-path:
     required: false
-    description: 'path to write snapshot diffs'
-    default: '/tmp/visual-snapshot-results'
+    description: "path to write snapshot diffs"
+    default: "/tmp/visual-snapshot-results"
   save-only:
     required: false
     default: false
-    description: 'should action only be used to save snapshots'
+    description: "should action only be used to save snapshots"
   base-workflow-id:
     required: false
-    description: 'id of the workflow that saves your base snapshots (the name of the yaml file including extension)'
+    description: "id of the workflow that saves your base snapshots (the name of the yaml file including extension)"
   base-branch:
     required: false
-    description: 'name of the branch to use as base comparison'
-    default: 'master'
+    description: "name of the branch to use as base comparison"
+    default: "master"
   artifact-name:
     required: false
-    description: 'the artifact name'
-    default: 'visual-snapshots'
+    description: "the artifact name"
+    default: "visual-snapshots"
 
   action-name:
     required: false
-    description: 'The name to be displayed in GitHub Checks'
-    default: 'Visual Snapshot'
+    description: "The name to be displayed in GitHub Checks"
+    default: "Visual Snapshot"
 
   storage-prefix:
-    require: false
-    description: 'if this is set, upload to cloud storage'
+    required: false
+    description: "if this is set, upload to cloud storage"
+  storage-url:
+    required: false
+    description: "public url to the cloud storage"
+
 outputs:
   results-path:
-    description: 'path where results are saved'
+    description: "path where results are saved"
   base-images-path:
-    description: 'path where base images are saved'
+    description: "path where base images are saved"
   merge-base-images-path:
-    description: 'path where merge base images are saved'
+    description: "path where merge base images are saved"
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"

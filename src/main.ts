@@ -44,8 +44,9 @@ async function run(): Promise<void> {
   const baseBranch = core.getInput('base-branch');
   const artifactName = core.getInput('artifact-name');
   const storagePrefix = core.getInput('storage-prefix');
+  const publicUrl = core.getInput('storage-url');
+
   const actionName = core.getInput('action-name');
-  const publicUrl = core.getInput('gallery-url');
   const snapshotPath: string = core.getInput('snapshot-path');
 
   const resultsPath = path.resolve(resultsRootPath, 'visual-snapshots-results');

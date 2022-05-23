@@ -690,8 +690,8 @@ function run() {
         const baseBranch = core.getInput('base-branch');
         const artifactName = core.getInput('artifact-name');
         const storagePrefix = core.getInput('storage-prefix');
+        const publicUrl = core.getInput('storage-url');
         const actionName = core.getInput('action-name');
-        const publicUrl = core.getInput('gallery-url');
         const snapshotPath = core.getInput('snapshot-path');
         const resultsPath = path_1.default.resolve(resultsRootPath, 'visual-snapshots-results');
         const basePath = path_1.default.resolve('/tmp/visual-snapshots-base');
