@@ -8799,6 +8799,7 @@ function fetchWrapper(requestOptions) {
     }
 
     if (status >= 400) {
+        console.log('Failed',requestOptions.url)
       return response.text().then(message => {
         const error = new requestError.RequestError(message, status, {
           headers,
