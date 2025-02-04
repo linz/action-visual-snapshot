@@ -12,7 +12,7 @@ type SaveSnapshotsParams = {
 };
 
 async function _save({rootDirectory, artifactName}: SaveSnapshotsParams) {
-  const artifactClient = artifact.create();
+  const artifactClient = new artifact.DefaultArtifactClient();
 
   await io.mkdirP('/tmp/snaps');
   await exec('tar', [
