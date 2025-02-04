@@ -5,6 +5,8 @@ import * as glob from '@actions/glob';
 import * as io from '@actions/io';
 import {fsa} from '@chunkd/fs';
 import path from 'path';
+import {FsAwsS3} from '@chunkd/source-aws';
+import S3 from 'aws-sdk/clients/s3';
 import {downloadOtherWorkflowArtifact} from './api/downloadOtherWorkflowArtifact';
 import {failBuild} from './api/failBuild';
 import {finishBuild} from './api/finishBuild';
@@ -23,6 +25,9 @@ const octokit = token && github.getOctokit(token);
 const {GITHUB_WORKSPACE, GITHUB_WORKFLOW} = process.env;
 const pngGlob = '/**/*.png';
 const shouldSaveOnly = core.getInput('save-only');
+
+
+fsa.register('s3://', new FsAwsS3(new S3()));
 
 function handleError(error: Error) {
   console.trace(error);
