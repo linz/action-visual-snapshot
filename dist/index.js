@@ -1388,14 +1388,15 @@ function downloadSnapshots({ artifactName, rootDirectory, }) {
         core.startGroup(description);
         const artifactClient = new artifact.DefaultArtifactClient();
         const artifactResp = yield artifactClient.getArtifact(artifactName);
-        if (artifactResp == null)
+        if (artifactResp == null) {
             throw new Error('Unable to find artifact: ' + artifactName);
+        }
         const resp = yield artifactClient.downloadArtifact(artifactResp.artifact.id, {
-            path: rootDirectory
-            // createArtifactFolder: true,
+            path: `${rootDirectory}/${artifactName}/`
         });
-        if (resp.downloadPath == null)
+        if (resp.downloadPath == null) {
             throw new Error('Unable to find artifact: ' + artifactName);
+        }
         // need to unzip everything now
         yield exec_1.exec('ls', [rootDirectory]);
         const tarGlobber = yield glob.create(`${rootDirectory}/${artifactName}/snap*.tar.gz`, {

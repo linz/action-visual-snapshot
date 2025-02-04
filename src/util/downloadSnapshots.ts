@@ -29,8 +29,7 @@ export async function downloadSnapshots({
   }
 
   const resp = await artifactClient.downloadArtifact(artifactResp.artifact.id, {
-    path: rootDirectory,
-    // createArtifactFolder: true,
+    path: `${rootDirectory}/${artifactName}/`,
   });
   if (resp.downloadPath == null) {
     throw new Error('Unable to find artifact: ' + artifactName);
