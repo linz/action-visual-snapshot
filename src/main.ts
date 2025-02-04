@@ -233,7 +233,7 @@ async function run(): Promise<void> {
           publicUrl,
           `${gcsDestination}/results/${relativeFilePath}`
         );
-        core.info(`Write source:${file} dest:${target} public: ${imageUrl}`);
+        core.info(`Write source:${file} dest:${target} public:${imageUrl}`);
 
         await fsa.write(target, fsa.stream(file), {
           contentType: file.endsWith('.png') ? 'image/png' : undefined,
