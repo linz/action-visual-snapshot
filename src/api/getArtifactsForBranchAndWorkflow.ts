@@ -55,7 +55,7 @@ export async function getArtifactsForBranchAndWorkflow(
   let completedWorkflowRuns: WorkflowRun[] = [];
 
   for await (const response of octokit.paginate.iterator(
-    octokit.actions.listWorkflowRuns,
+    octokit.actions.listWorkflowRuns as any,
     {
       owner,
       repo,
@@ -67,7 +67,9 @@ export async function getArtifactsForBranchAndWorkflow(
       per_page: PER_PAGE_LIMIT,
     }
   )) {
-    if (!response.data.length) {
+
+    const data = response.data as WorkflowRun[]
+    if (!data.length) {
       core.warning(`Workflow ${workflow_id} not found in branch ${branch}`);
       core.endGroup();
       return null;
@@ -78,7 +80,7 @@ export async function getArtifactsForBranchAndWorkflow(
     // a pull request that uses the base branch name.
     //
     // If this needs to be more generic, this should be an option.
-    const workflowRuns = response.data
+    const workflowRuns = data
       .filter(
         workflowRun =>
           workflowRun.head_repository.full_name === `${owner}/${repo}`

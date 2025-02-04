@@ -5,15 +5,12 @@
   "description": "GitHub Action to diff images",
   "main": "lib/main.js",
   "scripts": {
-    "build": "yarn tsc --build tsconfig.build.json",
-    "build-template": "yarn ts-node src/template/build",
-    "dev:gallery": "nodemon --watch src/template/index.ejs --watch src/template/dev.ts --exec \"ts-node\" ./src/template/dev.ts",
-    "format": "yarn prettier --write **/*.ts",
-    "format-check": "yarn prettier --check **/*.ts",
+    "build": "tsc --build tsconfig.build.json",
+    "build-template": "tsx src/template/build.ts",
+    "format": "prettier --write **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "dist": "yarn build-template && yarn build && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
-    "test": "yarn jest",
-    "all": "yarn build && yarn format && yarn lint && yarn test && yarn dist"
+    "dist": "npm run build-template && npm run build && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -56,7 +53,7 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
-    "@types/node": "^14.0.14",
+    "@types/node": "^20.17.17",
     "@typescript-eslint/eslint-plugin": "^4.4.0",
     "@typescript-eslint/parser": "^4.4.0",
     "esbuild": "^0.14.39",
@@ -70,7 +67,8 @@
     "lint-staged": "^10.4.0",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.1",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.3"
+    "ts-node": "^9.1.1",
+    "tsx": "^4.19.2",
+    "typescript": "4.9.x"
   }
 }

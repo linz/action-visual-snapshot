@@ -55,7 +55,7 @@ export async function saveSnapshots({
       core.endGroup();
       return result;
     } catch (err) {
-      if (!err.message.includes('ECONNRESET')) {
+      if (!String(err).includes('ECONNRESET')) {
         core.endGroup();
         throw err;
       }

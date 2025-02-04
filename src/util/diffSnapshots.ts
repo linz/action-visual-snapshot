@@ -195,7 +195,7 @@ export async function diffSnapshots({
 
         missingSnapshots.delete(file);
       } catch (err) {
-        core.debug(`Unable to diff: ${err.message}`);
+        core.debug(`Unable to diff: ${String(err)}`);
         throw err;
       }
     } else {

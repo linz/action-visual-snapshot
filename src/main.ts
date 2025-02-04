@@ -86,7 +86,7 @@ async function run(): Promise<void> {
       });
     }
   } catch (error) {
-    handleError(error);
+    handleError(error as Error);
   } finally {
     // Only needs to upload snapshots, do not proceed further
     if (shouldSaveOnly !== 'false') {
@@ -119,19 +119,17 @@ async function run(): Promise<void> {
   });
 
   try {
-    const [
-      didDownloadLatest,
-      didDownloadMergeBase,
-    ] = await retrieveBaseSnapshots(octokit, {
-      owner,
-      repo,
-      branch: baseBranch,
-      workflow_id: `${workflowRunPayload?.name || GITHUB_WORKFLOW}.yml`,
-      artifactName,
-      basePath,
-      mergeBasePath,
-      mergeBaseSha,
-    });
+    const [didDownloadLatest, didDownloadMergeBase] =
+      await retrieveBaseSnapshots(octokit, {
+        owner,
+        repo,
+        branch: baseBranch,
+        workflow_id: `${workflowRunPayload?.name || GITHUB_WORKFLOW}.yml`,
+        artifactName,
+        basePath,
+        mergeBasePath,
+        mergeBaseSha,
+      });
 
     if (!didDownloadLatest) {
       // It's possible there are no base snapshots e.g. if these are all
@@ -206,18 +204,14 @@ async function run(): Promise<void> {
 
     await io.mkdirP(resultsPath);
 
-    const {
-      baseFiles,
-      changedSnapshots,
-      missingSnapshots,
-      newSnapshots,
-    } = await diffSnapshots({
-      basePath,
-      mergeBasePath,
-      currentPath,
-      outputPath: resultsPath,
-      pixelmatchOptions,
-    });
+    const {baseFiles, changedSnapshots, missingSnapshots, newSnapshots} =
+      await diffSnapshots({
+        basePath,
+        mergeBasePath,
+        currentPath,
+        outputPath: resultsPath,
+        pixelmatchOptions,
+      });
 
     const resultsGlobber = await glob.create(`${resultsPath}${pngGlob}`, {
       followSymbolicLinks: false,
@@ -289,7 +283,7 @@ async function run(): Promise<void> {
       }),
     ]);
   } catch (error) {
-    handleError(error);
+    handleError(error as Error);
     failBuild({
       octokit,
       id: buildId,
