@@ -29,20 +29,6 @@
   ],
   "author": "Sentry",
   "license": "MIT",
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{html,ejs}": [
-      "yarn prettier --parser html --write"
-    ],
-    "*.{js,jsx,ts,tsx}": [
-      "yarn eslint --fix",
-      "yarn prettier --write"
-    ]
-  },
   "resolutions": {
     "node-forge": "^0.10.0"
   },
@@ -78,12 +64,10 @@
     "eslint-config-sentry": "^1.44.0",
     "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "husky": "^4.3.0",
     "jest": "^26.5.2",
     "jest-circus": "^26.5.2",
     "js-yaml": "^3.13.1",
     "lint-staged": "^10.4.0",
-    "nodemon": "^2.0.4",
     "prettier": "^2.1.2",
     "ts-jest": "^26.4.1",
     "ts-node": "^9.0.0",
