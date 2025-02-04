@@ -47,7 +47,7 @@
     "node-forge": "^0.10.0"
   },
   "dependencies": {
-    "@actions/artifact": "^0.4.0",
+    "@actions/artifact": "^2.2.1",
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",

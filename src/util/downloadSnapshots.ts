@@ -21,15 +21,20 @@ export async function downloadSnapshots({
   });
 
   core.startGroup(description);
-  const artifactClient = artifact.create();
+  const artifactClient = new artifact.DefaultArtifactClient();
 
-  const resp = await artifactClient.downloadArtifact(
-    artifactName,
-    rootDirectory,
-    {
-      createArtifactFolder: true,
-    }
-  );
+  const artifactResp = await artifactClient.getArtifact(artifactName);
+  if (artifactResp == null) {
+    throw new Error('Unable to find artifact: ' + artifactName);
+  }
+
+  const resp = await artifactClient.downloadArtifact(artifactResp.artifact.id, {
+    path: rootDirectory,
+    // createArtifactFolder: true,
+  });
+  if (resp.downloadPath == null) {
+    throw new Error('Unable to find artifact: ' + artifactName);
+  }
 
   // need to unzip everything now
   await exec('ls', [rootDirectory]);
