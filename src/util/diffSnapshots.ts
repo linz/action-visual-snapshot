@@ -133,7 +133,6 @@ export async function diffSnapshots({
         await io.mkdirP(path.resolve(base, childPath));
       } catch (err) {
         console.trace(err);
-        // Sentry.captureException(new Error(err.message));
       }
     }
   }

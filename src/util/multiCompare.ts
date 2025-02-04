@@ -69,7 +69,6 @@ export async function multiCompare({
     }
   } catch (err) {
     // Can't 3-way compare
-    // Sentry.captureException(err);
     console.log(err);
   }
 

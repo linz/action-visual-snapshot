@@ -17,8 +17,6 @@ import {downloadSnapshots} from './util/downloadSnapshots';
 import {generateImageGallery} from './util/generateImageGallery';
 import {saveSnapshots} from './util/saveSnapshots';
 
-fsa.list('s3://linz-basemaps');
-
 const {owner, repo} = github.context.repo;
 const token = core.getInput('github-token');
 const octokit = token && github.getOctokit(token);
@@ -27,7 +25,6 @@ const pngGlob = '/**/*.png';
 const shouldSaveOnly = core.getInput('save-only');
 
 function handleError(error: Error) {
-  // Sentry.captureException(error);
   console.trace(error);
   core.setFailed(error.message);
 }
