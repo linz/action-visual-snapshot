@@ -126273,10 +126273,7 @@ async function run() {
     name: actionName
   });
   try {
-    const [
-      didDownloadLatest,
-      didDownloadMergeBase
-    ] = await retrieveBaseSnapshots(octokit, {
+    const [didDownloadLatest, didDownloadMergeBase] = await retrieveBaseSnapshots(octokit, {
       owner,
       repo,
       branch: baseBranch,
@@ -126333,12 +126330,7 @@ async function run() {
     core9.startGroup("Starting diff of snapshots...");
     const pixelmatchOptions = getPixelmatchOptions();
     await io4.mkdirP(resultsPath);
-    const {
-      baseFiles,
-      changedSnapshots,
-      missingSnapshots,
-      newSnapshots
-    } = await diffSnapshots({
+    const { baseFiles, changedSnapshots, missingSnapshots, newSnapshots } = await diffSnapshots({
       basePath,
       mergeBasePath,
       currentPath,
@@ -126349,7 +126341,8 @@ async function run() {
       followSymbolicLinks: false
     });
     const resultsFiles = await resultsGlobber.glob();
-    const gcsDestination = `${owner}/${repo}/${headSha}`;
+    const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "/");
+    const gcsDestination = `${owner}/${repo}/${datePart}-${headSha}`;
     const resultsArtifactUrls = await Promise.all(
       resultsFiles.map(async (file) => {
         const relativeFilePath = import_path8.default.relative(resultsPath, file);

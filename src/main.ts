@@ -218,7 +218,8 @@ async function run(): Promise<void> {
     });
     const resultsFiles = await resultsGlobber.glob();
 
-    const gcsDestination = `${owner}/${repo}/${headSha}`;
+    const datePart = new Date().toISOString().slice(0,10).replace(/-/g,'/')
+    const gcsDestination = `${owner}/${repo}/${datePart}-${headSha}`;
 
     const resultsArtifactUrls = await Promise.all(
       resultsFiles.map(async file => {
