@@ -93,12 +93,19 @@ function download(url, file, dest) {
  */
 function downloadOtherWorkflowArtifact(octokit, { owner, repo, artifactId, downloadPath }) {
     return __awaiter(this, void 0, void 0, function* () {
-        const artifact = yield octokit.actions.downloadArtifact({
+        const response = yield octokit.request('GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}', {
             owner,
             repo,
             artifact_id: artifactId,
             archive_format: 'zip',
+            request: {
+                redirect: 'manual',
+            },
         });
+        const downloadUrl = response.headers.location;
+        if (!downloadUrl) {
+            throw new Error(`Failed to get artifact download URL for artifact ${artifactId}: missing Location header in response`);
+        }
         // Make sure output path exists
         try {
             yield io.mkdirP(downloadPath);
@@ -107,7 +114,7 @@ function downloadOtherWorkflowArtifact(octokit, { owner, repo, artifactId, downl
             // ignore errors
         }
         const downloadFile = path_1.default.resolve(downloadPath, FILENAME);
-        return yield download(artifact.url, downloadFile, downloadPath);
+        return yield download(downloadUrl, downloadFile, downloadPath);
     });
 }
 exports.downloadOtherWorkflowArtifact = downloadOtherWorkflowArtifact;
@@ -1392,7 +1399,7 @@ function downloadSnapshots({ artifactName, rootDirectory, }) {
             throw new Error('Unable to find artifact: ' + artifactName);
         }
         const resp = yield artifactClient.downloadArtifact(artifactResp.artifact.id, {
-            path: `${rootDirectory}/${artifactName}/`
+            path: `${rootDirectory}/${artifactName}/`,
         });
         if (resp.downloadPath == null) {
             throw new Error('Unable to find artifact: ' + artifactName);
@@ -51942,6 +51949,88 @@ exports.Octokit = Octokit;
 
 /***/ }),
 
+/***/ 99910:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var deprecation = __nccwpck_require__(58932);
+var once = _interopDefault(__nccwpck_require__(1223));
+
+const logOnceCode = once(deprecation => console.warn(deprecation));
+const logOnceHeaders = once(deprecation => console.warn(deprecation));
+/**
+ * Error with extra properties to help with debugging
+ */
+
+class RequestError extends Error {
+  constructor(message, statusCode, options) {
+    super(message); // Maintains proper stack trace (only available on V8)
+
+    /* istanbul ignore next */
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+
+    this.name = "HttpError";
+    this.status = statusCode;
+    let headers;
+
+    if ("headers" in options && typeof options.headers !== "undefined") {
+      headers = options.headers;
+    }
+
+    if ("response" in options) {
+      this.response = options.response;
+      headers = options.response.headers;
+    } // redact request credentials without mutating original request options
+
+
+    const requestCopy = Object.assign({}, options.request);
+
+    if (options.request.headers.authorization) {
+      requestCopy.headers = Object.assign({}, options.request.headers, {
+        authorization: options.request.headers.authorization.replace(/ .*$/, " [REDACTED]")
+      });
+    }
+
+    requestCopy.url = requestCopy.url // client_id & client_secret can be passed as URL query parameters to increase rate limit
+    // see https://developer.github.com/v3/#increasing-the-unauthenticated-rate-limit-for-oauth-applications
+    .replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]") // OAuth tokens can be passed as URL query parameters, although it is not recommended
+    // see https://developer.github.com/v3/#oauth2-token-sent-in-a-header
+    .replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
+    this.request = requestCopy; // deprecations
+
+    Object.defineProperty(this, "code", {
+      get() {
+        logOnceCode(new deprecation.Deprecation("[@octokit/request-error] `error.code` is deprecated, use `error.status`."));
+        return statusCode;
+      }
+
+    });
+    Object.defineProperty(this, "headers", {
+      get() {
+        logOnceHeaders(new deprecation.Deprecation("[@octokit/request-error] `error.headers` is deprecated, use `error.response.headers`."));
+        return headers || {};
+      }
+
+    });
+  }
+
+}
+
+exports.RequestError = RequestError;
+//# sourceMappingURL=index.js.map
+
+
+/***/ }),
+
 /***/ 6039:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -51956,7 +52045,7 @@ var endpoint = __nccwpck_require__(59440);
 var universalUserAgent = __nccwpck_require__(45030);
 var isPlainObject = __nccwpck_require__(3708);
 var nodeFetch = _interopDefault(__nccwpck_require__(13801));
-var requestError = __nccwpck_require__(10537);
+var requestError = __nccwpck_require__(99910);
 
 const VERSION = "5.6.3";
 
@@ -266668,7 +266757,7 @@ module.exports = JSON.parse('["ac","com.ac","edu.ac","gov.ac","net.ac","mil.ac",
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"action-visual-snapshot","version":"0.0.1","private":true,"description":"GitHub Action to diff images","main":"lib/main.js","scripts":{"build":"yarn tsc --build tsconfig.build.json","build-template":"yarn ts-node src/template/build","dev:gallery":"nodemon --watch src/template/index.ejs --watch src/template/dev.ts --exec \\"ts-node\\" ./src/template/dev.ts","format":"yarn prettier --write **/*.ts","format-check":"yarn prettier --check **/*.ts","lint":"eslint src/**/*.ts","dist":"yarn build-template && yarn build && yarn ncc build -C -s","test":"yarn jest","all":"yarn build && yarn format && yarn lint && yarn test && yarn dist"},"repository":{"type":"git","url":"git+https://github.com/getsentry/action-visual-snapshot.git"},"keywords":["actions","node","visual-snapshot","snapshot","testing","visual-regression"],"author":"Sentry","license":"MIT","husky":{"hooks":{"pre-commit":"lint-staged"}},"lint-staged":{"*.{html,ejs}":["yarn prettier --parser html --write"],"*.{js,jsx,ts,tsx}":["yarn eslint --fix","yarn prettier --write"]},"resolutions":{"node-forge":"^0.10.0"},"dependencies":{"@actions/artifact":"^2.2.1","@actions/core":"^1.2.6","@actions/exec":"^1.0.4","@actions/github":"^4.0.0","@actions/glob":"^0.1.0","@actions/io":"^1.0.2","@google-cloud/storage":"^5.4.0","@sentry/integrations":"^5.27.4","@sentry/node":"^5.27.4","@sentry/tracing":"^5.27.4","@types/async-retry":"^1.4.2","@types/bent":"^7.3.0","@types/ejs":"^3.0.4","@types/pixelmatch":"^5.2.2","@types/pngjs":"^3.4.2","@types/uuid":"^8.3.0","async-retry":"^1.3.1","bent":"^7.3.11","ejs":"^3.1.5","pixelmatch":"^5.2.1","pngjs":"^5.0.0","uuid":"^8.3.0"},"devDependencies":{"@types/jest":"^26.0.14","@types/node":"^14.0.14","@typescript-eslint/eslint-plugin":"^4.4.0","@typescript-eslint/parser":"^4.4.0","@vercel/ncc":"^0.33.3","eslint":"^7.10.0","eslint-config-sentry":"^1.44.0","eslint-plugin-jest":"^24.1.0","eslint-plugin-prettier":"^3.1.4","husky":"^4.3.0","jest":"^26.5.2","jest-circus":"^26.5.2","js-yaml":"^3.13.1","lint-staged":"^10.4.0","nodemon":"^2.0.4","prettier":"^2.1.2","ts-jest":"^26.4.1","ts-node":"^9.0.0","typescript":"^4.0.3"}}');
+module.exports = JSON.parse('{"name":"action-visual-snapshot","version":"0.0.1","private":true,"description":"GitHub Action to diff images","main":"lib/main.js","scripts":{"build":"yarn tsc --build tsconfig.build.json","build-template":"yarn ts-node src/template/build","dev:gallery":"nodemon --watch src/template/index.ejs --watch src/template/dev.ts --exec \\"ts-node\\" ./src/template/dev.ts","format":"yarn prettier --write **/*.ts","format-check":"yarn prettier --check **/*.ts","lint":"eslint src/**/*.ts","dist":"yarn build-template && yarn build && yarn ncc build -C -s","test":"yarn jest","all":"yarn build && yarn format && yarn lint && yarn test && yarn dist"},"repository":{"type":"git","url":"git+https://github.com/getsentry/action-visual-snapshot.git"},"keywords":["actions","node","visual-snapshot","snapshot","testing","visual-regression"],"author":"Sentry","license":"MIT","husky":{"hooks":{"pre-commit":"lint-staged"}},"lint-staged":{"*.{html,ejs}":["yarn prettier --parser html --write"],"*.{js,jsx,ts,tsx}":["yarn eslint --fix","yarn prettier --write"]},"resolutions":{"node-forge":"^0.10.0"},"dependencies":{"@actions/artifact":"^2.2.1","@actions/core":"^1.2.6","@actions/exec":"^1.0.4","@actions/github":"^4.0.0","@actions/glob":"^0.1.0","@actions/io":"^1.0.2","@google-cloud/storage":"^5.4.0","@sentry/integrations":"^5.27.4","@sentry/node":"^5.27.4","@sentry/tracing":"^5.27.4","@types/async-retry":"^1.4.2","@types/bent":"^7.3.0","@types/ejs":"^3.0.4","@types/pixelmatch":"^5.2.2","@types/pngjs":"^3.4.2","@types/uuid":"^8.3.0","async-retry":"^1.3.1","bent":"^7.3.11","ejs":"^3.1.5","pixelmatch":"^5.2.1","pngjs":"^5.0.0","uuid":"^8.3.0"},"devDependencies":{"@types/jest":"^26.0.14","@types/node":"^14.0.14","@typescript-eslint/eslint-plugin":"^4.4.0","@typescript-eslint/parser":"^4.4.0","@vercel/ncc":"^0.33.3","eslint":"^7.10.0","eslint-config-sentry":"^1.44.0","eslint-plugin-jest":"^27.9.0","eslint-plugin-prettier":"^3.1.4","husky":"^4.3.0","jest":"^26.5.2","jest-circus":"^26.5.2","js-yaml":"^3.13.1","lint-staged":"^10.4.0","nodemon":"^2.0.4","prettier":"^2.1.2","ts-jest":"^26.4.1","ts-node":"^9.0.0","typescript":"^4.0.3"}}');
 
 /***/ })
 
