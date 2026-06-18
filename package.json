@@ -78,7 +78,7 @@
     "@vercel/ncc": "^0.33.3",
     "eslint": "^7.10.0",
     "eslint-config-sentry": "^1.44.0",
-    "eslint-plugin-jest": "^24.1.0",
+    "eslint-plugin-jest": "^27.9.0",
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.3.0",
     "jest": "^26.5.2",
