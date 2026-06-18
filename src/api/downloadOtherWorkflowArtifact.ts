@@ -69,12 +69,26 @@ export async function downloadOtherWorkflowArtifact(
   octokit: ReturnType<typeof github.getOctokit>,
   {owner, repo, artifactId, downloadPath}: DownloadArtifactParams
 ) {
-  const artifact = await octokit.actions.downloadArtifact({
-    owner,
-    repo,
-    artifact_id: artifactId,
-    archive_format: 'zip',
-  });
+  const response = await octokit.request(
+    'GET /repos/{owner}/{repo}/actions/artifacts/{artifact_id}/{archive_format}',
+    {
+      owner,
+      repo,
+      artifact_id: artifactId,
+      archive_format: 'zip',
+      request: {
+        redirect: 'manual',
+      },
+    }
+  );
+
+  const downloadUrl = (response.headers as Record<string, string>).location;
+
+  if (!downloadUrl) {
+    throw new Error(
+      `Failed to get artifact download URL for artifact ${artifactId}: missing Location header in response`
+    );
+  }
 
   // Make sure output path exists
   try {
@@ -85,5 +99,5 @@ export async function downloadOtherWorkflowArtifact(
 
   const downloadFile = path.resolve(downloadPath, FILENAME);
 
-  return await download(artifact.url, downloadFile, downloadPath);
+  return await download(downloadUrl, downloadFile, downloadPath);
 }
