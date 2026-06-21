@@ -5,10 +5,10 @@ import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
 
-import type { PixelmatchOptions } from '../types';
-import { createDiff } from './createDiff';
-import { getChildDirectories } from './getChildDirectories';
-import { multiCompare } from './multiCompare';
+import type { PixelmatchOptions } from '../types.ts';
+import { createDiff } from './createDiff.ts';
+import { getChildDirectories } from './getChildDirectories.ts';
+import { multiCompare } from './multiCompare.ts';
 
 const pngGlob = '/**/*.png';
 

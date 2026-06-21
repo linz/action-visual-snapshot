@@ -3,11 +3,11 @@ import path from 'path';
 
 import { PNG } from 'pngjs';
 
-import type { PixelmatchOptions } from '../types';
-import { copyPixel } from './copyPixel';
-import { fileToPng } from './fileToPng';
-import { findChangedPixels } from './findChangedPixels';
-import { getDiff } from './getDiff';
+import type { PixelmatchOptions } from '../types.ts';
+import { copyPixel } from './copyPixel.ts';
+import { fileToPng } from './fileToPng.ts';
+import { findChangedPixels } from './findChangedPixels.ts';
+import { getDiff } from './getDiff.ts';
 
 type Options = {
   snapshotName: string;

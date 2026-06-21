@@ -1,9 +1,9 @@
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
-import type { PixelmatchOptions } from '../types';
-import { fileToPng } from './fileToPng';
-import { resizeImage } from './resizeImage';
+import type { PixelmatchOptions } from '../types.ts';
+import { fileToPng } from './fileToPng.ts';
+import { resizeImage } from './resizeImage.ts';
 
 export async function getDiff(
   file1: string | PNG,

@@ -1,7 +1,7 @@
 import path from 'path';
 
-import { generateImageGallery } from '../util/generateImageGallery';
-import { build } from './build';
+import { generateImageGallery } from '../util/generateImageGallery.ts';
+import { build } from './build.ts';
 
 async function main() {
   await build();

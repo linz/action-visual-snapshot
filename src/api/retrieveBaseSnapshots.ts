@@ -2,10 +2,10 @@ import * as core from '@actions/core';
 import type * as github from '@actions/github';
 import retry from 'async-retry';
 
-import type { Await } from '../types';
-import { downloadOtherWorkflowArtifact } from './downloadOtherWorkflowArtifact';
-import type { GetArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow';
-import { getArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow';
+import type { Await } from '../types.ts';
+import { downloadOtherWorkflowArtifact } from './downloadOtherWorkflowArtifact.ts';
+import type { GetArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow.ts';
+import { getArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow.ts';
 
 type GetArtifactsForBranchAndWorkflowType = Await<ReturnType<typeof getArtifactsForBranchAndWorkflow>> | null;
 

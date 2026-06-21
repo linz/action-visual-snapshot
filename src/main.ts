@@ -9,17 +9,17 @@ import { S3Client } from '@aws-sdk/client-s3';
 import { fsa } from '@chunkd/fs';
 import { FsAwsS3 } from '@chunkd/fs-aws';
 
-import { downloadOtherWorkflowArtifact } from './api/downloadOtherWorkflowArtifact';
-import { failBuild } from './api/failBuild';
-import { finishBuild } from './api/finishBuild';
-import { retrieveBaseSnapshots } from './api/retrieveBaseSnapshots';
-import { startBuild } from './api/startBuild';
-import { getPixelmatchOptions } from './getPixelmatchOptions';
-import type { Await } from './types';
-import { diffSnapshots } from './util/diffSnapshots';
-import { downloadSnapshots } from './util/downloadSnapshots';
-import { generateImageGallery } from './util/generateImageGallery';
-import { saveSnapshots } from './util/saveSnapshots';
+import { downloadOtherWorkflowArtifact } from './api/downloadOtherWorkflowArtifact.ts';
+import { failBuild } from './api/failBuild.ts';
+import { finishBuild } from './api/finishBuild.ts';
+import { retrieveBaseSnapshots } from './api/retrieveBaseSnapshots.ts';
+import { startBuild } from './api/startBuild.ts';
+import { getPixelmatchOptions } from './getPixelmatchOptions.ts';
+import type { Await } from './types.ts';
+import { diffSnapshots } from './util/diffSnapshots.ts';
+import { downloadSnapshots } from './util/downloadSnapshots.ts';
+import { generateImageGallery } from './util/generateImageGallery.ts';
+import { saveSnapshots } from './util/saveSnapshots.ts';
 
 const { owner, repo } = github.context.repo;
 const token = core.getInput('github-token');

@@ -3,8 +3,8 @@ import path from 'path';
 
 import { PNG } from 'pngjs';
 
-import type { PixelmatchOptions } from '../types';
-import { getDiff } from './getDiff';
+import type { PixelmatchOptions } from '../types.ts';
+import { getDiff } from './getDiff.ts';
 
 /**
  * Creates a combined diff of @file1 and @file2 and writes to disk
