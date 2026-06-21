@@ -3,7 +3,7 @@ import path from 'path';
 
 import { PNG } from 'pngjs';
 
-import type { PixelmatchOptions } from '../types.ts';
+import type { PixelmatchOptions } from '../types';
 import { copyPixel } from './copyPixel';
 import { fileToPng } from './fileToPng';
 import { findChangedPixels } from './findChangedPixels';

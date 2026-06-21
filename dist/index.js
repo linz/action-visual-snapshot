@@ -153618,6 +153618,7 @@ var require_dist7 = __commonJS({
 });
 
 // src/main.ts
+var import_path8 = __toESM(require("path"));
 var core9 = __toESM(require_core());
 var github = __toESM(require_github());
 var glob5 = __toESM(require_glob());
@@ -155480,9 +155481,6 @@ var fsHttp = new FsHttp();
 fsa.register("http://", fsHttp);
 fsa.register("https://", fsHttp);
 
-// src/main.ts
-var import_path8 = __toESM(require("path"));
-
 // node_modules/@chunkd/source-aws/build/type.js
 function toPromise(req) {
   if ("promise" in req)
@@ -155702,10 +155700,10 @@ var import_s3 = __toESM(require_s33());
 
 // src/api/downloadOtherWorkflowArtifact.ts
 var import_path3 = __toESM(require("path"));
-var import_exec = __toESM(require_exec());
 var core = __toESM(require_core());
-var io = __toESM(require_io());
+var import_exec = __toESM(require_exec());
 var glob = __toESM(require_glob());
+var io = __toESM(require_io());
 var FILENAME = "visual-snapshots-base.zip";
 async function download(url, file, dest) {
   core.startGroup(`download ${file}`);
@@ -155815,59 +155813,41 @@ ${[...added].map((name) => `* ${name}`).join("\n")}
 }
 
 // src/api/retrieveBaseSnapshots.ts
-var import_async_retry = __toESM(require_lib5());
 var core3 = __toESM(require_core());
+var import_async_retry = __toESM(require_lib5());
 
 // src/api/getArtifactsForBranchAndWorkflow.ts
 var core2 = __toESM(require_core());
 var MAX_PAGES = 10;
 var PER_PAGE_LIMIT = 30;
-async function getArtifactsForBranchAndWorkflow(octokit2, {
-  owner: owner2,
-  repo: repo2,
-  workflow_id,
-  branch,
-  commit,
-  artifactName
-}) {
+async function getArtifactsForBranchAndWorkflow(octokit2, { owner: owner2, repo: repo2, workflow_id, branch, commit, artifactName }) {
   core2.startGroup(
     `getArtifactsForBranchAndWorkflow - workflow:"${workflow_id}",  branch:"${branch}"${commit ? `,  commit:"${commit}"` : ""}`
   );
   let currentPage = 0;
   let completedWorkflowRuns = [];
-  for await (const response of octokit2.paginate.iterator(
-    octokit2.actions.listWorkflowRuns,
-    {
-      owner: owner2,
-      repo: repo2,
-      workflow_id,
-      per_page: PER_PAGE_LIMIT
-    }
-  )) {
+  for await (const response of octokit2.paginate.iterator(octokit2.actions.listWorkflowRuns, {
+    owner: owner2,
+    repo: repo2,
+    workflow_id,
+    per_page: PER_PAGE_LIMIT
+  })) {
     const data = response.data;
     if (!data.length) {
       core2.warning(`Workflow ${workflow_id} not found in branch ${branch}`);
       core2.endGroup();
       return null;
     }
-    const workflowRuns = data.filter(
-      (workflowRun) => workflowRun.head_repository.full_name === `${owner2}/${repo2}`
-    ).filter(
+    const workflowRuns = data.filter((workflowRun) => workflowRun.head_repository.full_name === `${owner2}/${repo2}`).filter(
       (workflowRun) => workflowRun.head_branch === branch && workflowRun.conclusion === "success"
     );
-    const workflowRunsForCommit = commit ? workflowRuns.filter(
-      (run2) => run2.head_sha === commit
-    ) : workflowRuns;
+    const workflowRunsForCommit = commit ? workflowRuns.filter((run2) => run2.head_sha === commit) : workflowRuns;
     if (workflowRunsForCommit.length) {
-      completedWorkflowRuns = completedWorkflowRuns.concat(
-        workflowRunsForCommit
-      );
+      completedWorkflowRuns = completedWorkflowRuns.concat(workflowRunsForCommit);
       break;
     }
     if (currentPage > MAX_PAGES) {
-      core2.warning(
-        `Workflow ${workflow_id} not found in branch: ${branch}${commit ? ` and commit: ${commit}` : ""}`
-      );
+      core2.warning(`Workflow ${workflow_id} not found in branch: ${branch}${commit ? ` and commit: ${commit}` : ""}`);
       core2.endGroup();
       return null;
     }
@@ -155947,9 +155927,7 @@ async function retrieveBaseSnapshots(octokit2, {
   let mergeBaseArtifacts = null;
   core3.startGroup("workflowRun");
   core3.debug(`Merge base SHA: ${mergeBaseSha}`);
-  core3.debug(
-    `workflowRun head sha (i.e. latest master): ${workflowRun.head_sha}`
-  );
+  core3.debug(`workflowRun head sha (i.e. latest master): ${workflowRun.head_sha}`);
   core3.debug(`!!! workflowRun:
 ${JSON.stringify(workflowRun, null, 2)}`);
   core3.endGroup();
@@ -155989,9 +155967,7 @@ ${JSON.stringify(workflowRun, null, 2)}`);
 var core4 = __toESM(require_core());
 async function startBuild(opt) {
   core4.startGroup("Starting build using GitHub API directly...");
-  core4.info(
-    `CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`
-  );
+  core4.info(`CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`);
   const { data: check } = await opt.octokit.checks.create({
     owner: opt.owner,
     repo: opt.repo,
@@ -156007,9 +155983,7 @@ async function startBuild(opt) {
 var core5 = __toESM(require_core());
 var OPTIONS = ["threshold", "includeAA", "alpha", "diffMask"];
 function getPixelmatchOptions() {
-  const inputs = Object.fromEntries(
-    OPTIONS.map((option) => [option, core5.getInput(option)])
-  );
+  const inputs = Object.fromEntries(OPTIONS.map((option) => [option, core5.getInput(option)]));
   return {
     ...inputs,
     ...!inputs.includeAA || inputs.includeAA === "false" ? { includeAA: false } : { includeAA: true }
@@ -156017,6 +155991,7 @@ function getPixelmatchOptions() {
 }
 
 // src/util/diffSnapshots.ts
+var import_fs6 = require("fs");
 var import_path7 = __toESM(require("path"));
 var core6 = __toESM(require_core());
 var glob2 = __toESM(require_glob());
@@ -156028,8 +156003,8 @@ var import_path4 = __toESM(require("path"));
 var import_pngjs4 = __toESM(require_png());
 
 // src/util/getDiff.ts
-var import_pngjs3 = __toESM(require_png());
 var import_pixelmatch = __toESM(require_pixelmatch());
+var import_pngjs3 = __toESM(require_png());
 
 // src/util/fileToPng.ts
 var import_fs3 = require("fs");
@@ -156106,17 +156081,27 @@ async function createDiff(snapshotName, output, file1, file2, pixelmatchOptions)
   console.log({ snapshotName, output, result });
   if (result > 0) {
     await import_fs4.promises.mkdir(output, { recursive: true });
-    await import_fs4.promises.writeFile(
-      import_path4.default.resolve(output, snapshotName),
-      import_pngjs4.PNG.sync.write(diff)
-    );
+    await import_fs4.promises.writeFile(import_path4.default.resolve(output, snapshotName), import_pngjs4.PNG.sync.write(diff));
   }
   return result;
 }
 
+// src/util/getDirectoriesToFile.ts
+var import_path5 = __toESM(require("path"));
+function getDirectoriesToFile(from, to) {
+  return import_path5.default.relative(from, import_path5.default.dirname(to));
+}
+
+// src/util/getChildDirectories.ts
+function getChildDirectories(targets) {
+  return new Set(
+    targets.reduce((acc, [base, files]) => acc.concat(files.map((file) => getDirectoriesToFile(base, file))), []).filter(Boolean)
+  );
+}
+
 // src/util/multiCompare.ts
 var import_fs5 = require("fs");
-var import_path5 = __toESM(require("path"));
+var import_path6 = __toESM(require("path"));
 var import_pngjs5 = __toESM(require_png());
 
 // src/util/copyPixel.ts
@@ -156153,73 +156138,39 @@ async function multiCompare({
   pixelmatchOptions
 }) {
   const promises = [];
-  const [
-    baseHeadImage,
-    branchHeadMergedImage,
-    branchBaseImage
-  ] = await Promise.all([
+  const [baseHeadImage, branchHeadMergedImage, branchBaseImage] = await Promise.all([
     fileToPng(baseHead),
     fileToPng(branchHead),
     fileToPng(branchBase)
   ]);
   try {
-    const {
-      result: baseDiffResult,
-      diff: branchBaseBaseHeadDiffImage
-    } = await getDiff(branchBaseImage, baseHeadImage, {
-      ...pixelmatchOptions,
-      alpha: 0
-    });
+    const { result: baseDiffResult, diff: branchBaseBaseHeadDiffImage } = await getDiff(
+      branchBaseImage,
+      baseHeadImage,
+      {
+        ...pixelmatchOptions,
+        alpha: 0
+      }
+    );
     if (baseDiffResult > 0) {
       const changedPixels = findChangedPixels(branchBaseBaseHeadDiffImage);
       changedPixels.forEach((idx) => {
         copyPixel(idx, baseHeadImage, branchHeadMergedImage);
       });
-      promises.push(
-        import_fs5.promises.writeFile(
-          import_path5.default.resolve(outputMergedPath, snapshotName),
-          import_pngjs5.PNG.sync.write(branchHeadMergedImage)
-        )
-      );
+      promises.push(import_fs5.promises.writeFile(import_path6.default.resolve(outputMergedPath, snapshotName), import_pngjs5.PNG.sync.write(branchHeadMergedImage)));
     }
   } catch (err) {
     console.log(err);
   }
-  const { result, diff } = await getDiff(
-    baseHeadImage,
-    branchHeadMergedImage,
-    pixelmatchOptions
-  );
+  const { result, diff } = await getDiff(baseHeadImage, branchHeadMergedImage, pixelmatchOptions);
   if (result > 0) {
-    promises.push(
-      import_fs5.promises.writeFile(
-        import_path5.default.resolve(outputDiffPath, snapshotName),
-        import_pngjs5.PNG.sync.write(diff)
-      )
-    );
+    promises.push(import_fs5.promises.writeFile(import_path6.default.resolve(outputDiffPath, snapshotName), import_pngjs5.PNG.sync.write(diff)));
   }
   await Promise.all(promises);
   return result;
 }
 
-// src/util/getDirectoriesToFile.ts
-var import_path6 = __toESM(require("path"));
-function getDirectoriesToFile(from, to) {
-  return import_path6.default.relative(from, import_path6.default.dirname(to));
-}
-
-// src/util/getChildDirectories.ts
-function getChildDirectories(targets) {
-  return new Set(
-    targets.reduce(
-      (acc, [base, files]) => acc.concat(files.map((file) => getDirectoriesToFile(base, file))),
-      []
-    ).filter(Boolean)
-  );
-}
-
 // src/util/diffSnapshots.ts
-var import_fs6 = require("fs");
 var pngGlob = "/**/*.png";
 async function diffSnapshots({
   basePath,
@@ -156269,9 +156220,7 @@ async function diffSnapshots({
     baseSnapshots.add(file);
     missingSnapshots.add(file);
   });
-  const mergeBaseSnapshots = new Set(
-    mergeBaseFiles.map((absolute) => import_path7.default.relative(mergeBasePath, absolute))
-  );
+  const mergeBaseSnapshots = new Set(mergeBaseFiles.map((absolute) => import_path7.default.relative(mergeBasePath, absolute)));
   const childPaths = getChildDirectories([
     [currentPath, currentFiles],
     [basePath, baseFiles]
@@ -156292,7 +156241,7 @@ async function diffSnapshots({
   ]) {
     console.log("Mkdir", { base });
     await import_fs6.promises.mkdir(base, { recursive: true });
-    for (const childPath of [...childPaths]) {
+    for (const childPath of childPaths) {
       console.log("Mkdir", import_path7.default.resolve(base, childPath));
       try {
         await io2.mkdirP(import_path7.default.resolve(base, childPath));
@@ -156329,13 +156278,7 @@ async function diffSnapshots({
             branchHead,
             pixelmatchOptions
           });
-          isDiff = await createDiff(
-            file,
-            outputDiffPath,
-            baseHead,
-            branchHead,
-            pixelmatchOptions
-          );
+          isDiff = await createDiff(file, outputDiffPath, baseHead, branchHead, pixelmatchOptions);
         }
         if (isDiff) {
           console.log("isDiff", isDiff);
@@ -156371,18 +156314,12 @@ async function diffSnapshots({
   });
   await Promise.all(
     [...missingSnapshots].map(
-      async (file) => await io2.cp(
-        import_path7.default.resolve(basePath, file),
-        import_path7.default.resolve(outputMissingPath, file)
-      )
+      async (file) => await io2.cp(import_path7.default.resolve(basePath, file), import_path7.default.resolve(outputMissingPath, file))
     )
   );
   await Promise.all(
     [...newSnapshots].map(
-      async (file) => await io2.cp(
-        import_path7.default.resolve(currentPath, file),
-        import_path7.default.resolve(outputNewPath, file)
-      )
+      async (file) => await io2.cp(import_path7.default.resolve(currentPath, file), import_path7.default.resolve(outputNewPath, file))
     )
   );
   return {
@@ -156395,14 +156332,11 @@ async function diffSnapshots({
 }
 
 // src/util/downloadSnapshots.ts
-var core7 = __toESM(require_core());
 var artifact = __toESM(require_artifact2());
+var core7 = __toESM(require_core());
 var import_exec2 = __toESM(require_exec());
 var glob3 = __toESM(require_glob());
-async function downloadSnapshots({
-  artifactName,
-  rootDirectory
-}) {
+async function downloadSnapshots({ artifactName, rootDirectory }) {
   const description = `downloadSnapshots: ${artifactName}`;
   core7.startGroup(description);
   const artifactClient = new artifact.DefaultArtifactClient();
@@ -156417,12 +156351,9 @@ async function downloadSnapshots({
     throw new Error("Unable to find artifact: " + artifactName);
   }
   await (0, import_exec2.exec)("ls", [rootDirectory]);
-  const tarGlobber = await glob3.create(
-    `${rootDirectory}/${artifactName}/snap*.tar.gz`,
-    {
-      followSymbolicLinks: false
-    }
-  );
+  const tarGlobber = await glob3.create(`${rootDirectory}/${artifactName}/snap*.tar.gz`, {
+    followSymbolicLinks: false
+  });
   const tarFiles = await tarGlobber.glob();
   for (const file of tarFiles) {
     await (0, import_exec2.exec)("tar", ["zxf", file, "-C", resp.downloadPath]);
@@ -156444,11 +156375,11 @@ async function generateImageGallery(target, data) {
 }
 
 // src/util/saveSnapshots.ts
-var io3 = __toESM(require_io());
-var core8 = __toESM(require_core());
 var artifact2 = __toESM(require_artifact2());
+var core8 = __toESM(require_core());
 var import_exec3 = __toESM(require_exec());
 var glob4 = __toESM(require_glob());
+var io3 = __toESM(require_io());
 
 // node_modules/uuid/wrapper.mjs
 var import_dist = __toESM(require_dist7(), 1);
@@ -156466,28 +156397,15 @@ var parse = import_dist.default.parse;
 async function _save({ rootDirectory, artifactName }) {
   const artifactClient = new artifact2.DefaultArtifactClient();
   await io3.mkdirP("/tmp/snaps");
-  await (0, import_exec3.exec)("tar", [
-    "czf",
-    `/tmp/snaps/snap-${v4()}.tar.gz`,
-    "-C",
-    rootDirectory,
-    "."
-  ]);
+  await (0, import_exec3.exec)("tar", ["czf", `/tmp/snaps/snap-${v4()}.tar.gz`, "-C", rootDirectory, "."]);
   const tarGlobber = await glob4.create("/tmp/snaps/*.tar.gz", {
     followSymbolicLinks: false
   });
   const tarFiles = await tarGlobber.glob();
-  const result = await artifactClient.uploadArtifact(
-    artifactName,
-    tarFiles,
-    "/tmp/snaps"
-  );
+  const result = await artifactClient.uploadArtifact(artifactName, tarFiles, "/tmp/snaps");
   return result;
 }
-async function saveSnapshots({
-  artifactName,
-  rootDirectory
-}) {
+async function saveSnapshots({ artifactName, rootDirectory }) {
   core8.startGroup("saveSnapshots");
   let retries = 5;
   while (retries > 0) {
@@ -156555,10 +156473,9 @@ async function run() {
     }
   } catch (error2) {
     handleError(error2);
-  } finally {
-    if (shouldSaveOnly !== "false") {
-      return;
-    }
+  }
+  if (shouldSaveOnly !== "false") {
+    return;
   }
   if (!octokit) {
     const error2 = new Error("`github-token` missing");
@@ -156566,9 +156483,7 @@ async function run() {
     throw error2;
   }
   if (workflowRunPayload?.event === "push") {
-    core9.debug(
-      "Push event triggered `workflow_run`... skipping as this only works for PRs"
-    );
+    core9.debug("Push event triggered `workflow_run`... skipping as this only works for PRs");
     return;
   }
   const buildId = await startBuild({
@@ -156608,9 +156523,7 @@ async function run() {
         });
         const artifact3 = data.artifacts.find(({ name }) => name === artifactName);
         if (!artifact3) {
-          throw new Error(
-            `Unable to find artifact from ${workflowRunPayload?.html_url}`
-          );
+          throw new Error(`Unable to find artifact from ${workflowRunPayload?.html_url}`);
         }
         downloadResp = await downloadOtherWorkflowArtifact(octokit, {
           owner,
@@ -156653,14 +156566,8 @@ async function run() {
     const resultsArtifactUrls = await Promise.all(
       resultsFiles.map(async (file) => {
         const relativeFilePath = import_path8.default.relative(resultsPath, file);
-        const target = fsa.join(
-          storagePrefix,
-          `${gcsDestination}/results/${relativeFilePath}`
-        );
-        const imageUrl = fsa.join(
-          publicUrl,
-          `${gcsDestination}/results/${relativeFilePath}`
-        );
+        const target = fsa.join(storagePrefix, `${gcsDestination}/results/${relativeFilePath}`);
+        const imageUrl = fsa.join(publicUrl, `${gcsDestination}/results/${relativeFilePath}`);
         core9.info(`Write source:${file} dest:${target} public:${imageUrl}`);
         await fsa.write(target, fsa.stream(file), {
           contentType: file.endsWith(".png") ? "image/png" : void 0
@@ -156677,10 +156584,7 @@ async function run() {
     };
     core9.endGroup();
     core9.startGroup("Generating image gallery...");
-    await generateImageGallery(
-      import_path8.default.resolve(resultsPath, "index.html"),
-      results
-    );
+    await generateImageGallery(import_path8.default.resolve(resultsPath, "index.html"), results);
     await fsa.write(
       fsa.join(storagePrefix, `${gcsDestination}/index.html`),
       fsa.stream(import_path8.default.resolve(resultsPath, "index.html")),
@@ -156706,7 +156610,7 @@ async function run() {
     ]);
   } catch (error2) {
     handleError(error2);
-    failBuild({
+    await failBuild({
       octokit,
       id: buildId,
       owner,
@@ -156715,7 +156619,10 @@ async function run() {
     });
   }
 }
-run();
+run().catch((e2) => {
+  console.error(e2);
+  throw e2;
+});
 /*!
  * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
  *

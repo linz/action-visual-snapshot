@@ -1,6 +1,6 @@
 import * as core from '@actions/core';
 
-import type { PixelmatchOptions } from './types.ts';
+import type { PixelmatchOptions } from './types';
 
 const OPTIONS = ['threshold', 'includeAA', 'alpha', 'diffMask'] as const;
 

@@ -1,7 +1,7 @@
 import pixelmatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 
-import type { PixelmatchOptions } from '../types.ts';
+import type { PixelmatchOptions } from '../types';
 import { fileToPng } from './fileToPng';
 import { resizeImage } from './resizeImage';
 

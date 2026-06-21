@@ -5,7 +5,7 @@ import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
 
-import type { PixelmatchOptions } from '../types.ts';
+import type { PixelmatchOptions } from '../types';
 import { createDiff } from './createDiff';
 import { getChildDirectories } from './getChildDirectories';
 import { multiCompare } from './multiCompare';

@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import type * as github from '@actions/github';
 import retry from 'async-retry';
 
-import type { Await } from '../types.ts';
+import type { Await } from '../types';
 import { downloadOtherWorkflowArtifact } from './downloadOtherWorkflowArtifact';
 import type { GetArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow';
 import { getArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow';
@@ -58,8 +58,8 @@ export async function retrieveBaseSnapshots(
       }),
     {
       onRetry: (err) => {
-        console.log(workflowRun); // eslint-disable-line no-console
-        console.error(err); // eslint-disable-line no-console
+        console.log(workflowRun);
+        console.error(err);
       },
     },
   );
@@ -89,13 +89,13 @@ ${JSON.stringify(workflowRun, null, 2)}`);
           await downloadOtherWorkflowArtifact(octokit, {
             owner,
             repo,
-            artifactId: mergeBaseArtifacts.artifact.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+            artifactId: mergeBaseArtifacts!.artifact.id,
             downloadPath: mergeBasePath,
           }),
         {
           onRetry: (err) => {
-            console.log(workflowRun); // eslint-disable-line no-console
-            console.error(err); // eslint-disable-line
+            console.log(workflowRun);
+            console.error(err);
           },
         },
       );
