@@ -25,10 +25,6 @@ inputs:
     required: false
     description: 'the merge base sha, will use from github context otherwise. If you use `pull_request_target` you will need to supply the merge base.'
 
-  api-token:
-    required: true
-    description: 'Visual Snapshot API token, should be `VISUAL_SNAPSHOT_SECRET` from GitHub Secrets'
-
   github-token:
     required: false
     description: 'github token'

@@ -1,0 +1,53 @@
+name: e2e-test
+on:
+  pull_request:
+  push:
+    branches:
+      - master # Triggers on master to save the initial "base" snapshots
+jobs:
+  e2e-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+
+      - name: Install dependencies & build
+        run: |
+          npm ci
+          npm run dist
+
+      - name: Setup Mock Snapshots
+        run: |
+          # Copy your test fixtures to the directory the action will read from
+          mkdir -p /tmp/mock-snapshots
+          # Replace this with the path to your actual test images
+          # cp -r __tests__/fixtures/snapshots/* /tmp/mock-snapshots/
+          
+      - name: Run Visual Snapshot Action
+        id: visual-snapshots-diff
+        uses: ./
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          snapshot-path: /tmp/mock-snapshots
+          artifact-name: e2e-test-snapshots
+          action-name: E2E Test Snapshots
+          results-path: /tmp/e2e-results
+
+      - name: Verify Results
+        if: github.event_name == 'pull_request'
+        run: |
+          # Add custom bash assertions here to verify the action produced the expected diff files
+          echo "Checking if results were generated..."
+          ls -la /tmp/e2e-results/visual-snapshots-results
+          
+          # Example: Fail the test if no diff index.html was generated
+          if [ ! -f "/tmp/e2e-results/visual-snapshots-results/index.html" ]; then
+            echo "Expected index.html was not generated!"
+            exit 1
+          fi
