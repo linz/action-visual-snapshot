@@ -23,10 +23,8 @@ jobs:
 
       - name: Setup Mock Snapshots
         run: |
-          # Copy your test fixtures to the directory the action will read from
           mkdir -p /tmp/mock-snapshots
-          # Replace this with the path to your actual test images
-          # cp -r __tests__/fixtures/snapshots/* /tmp/mock-snapshots/
+          cp -r src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/
 
       - name: Run Visual Snapshot Action
         id: visual-snapshots-diff
