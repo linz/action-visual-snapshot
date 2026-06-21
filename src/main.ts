@@ -5,9 +5,9 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
+import { S3Client } from '@aws-sdk/client-s3';
 import { fsa } from '@chunkd/fs';
-import { FsAwsS3 } from '@chunkd/source-aws';
-import S3 from 'aws-sdk/clients/s3';
+import { FsAwsS3 } from '@chunkd/fs-aws';
 
 import { downloadOtherWorkflowArtifact } from './api/downloadOtherWorkflowArtifact';
 import { failBuild } from './api/failBuild';
@@ -28,7 +28,7 @@ const { GITHUB_WORKSPACE, GITHUB_WORKFLOW } = process.env;
 const pngGlob = '/**/*.png';
 const shouldSaveOnly = core.getInput('save-only');
 
-fsa.register('s3://', new FsAwsS3(new S3()));
+fsa.register('s3://', new FsAwsS3(new S3Client()));
 
 function handleError(error: Error) {
   console.trace(error);
@@ -39,8 +39,8 @@ async function run(): Promise<void> {
   const resultsRootPath: string = core.getInput('results-path');
   const baseBranch = core.getInput('base-branch');
   const artifactName = core.getInput('artifact-name');
-  const storagePrefix = core.getInput('storage-prefix');
-  const publicUrl = core.getInput('storage-url');
+  const storagePrefix = fsa.toUrl(core.getInput('storage-prefix'));
+  const publicUrl = fsa.toUrl(core.getInput('storage-url'));
 
   const actionName = core.getInput('action-name');
   const snapshotPath: string = core.getInput('snapshot-path');
@@ -217,11 +217,11 @@ async function run(): Promise<void> {
       resultsFiles.map(async (file) => {
         const relativeFilePath = path.relative(resultsPath, file);
 
-        const target = fsa.join(storagePrefix, `${gcsDestination}/results/${relativeFilePath}`);
-        const imageUrl = fsa.join(publicUrl, `${gcsDestination}/results/${relativeFilePath}`);
-        core.info(`Write source:${file} dest:${target} public:${imageUrl}`);
+        const target = new URL(`${gcsDestination}/results/${relativeFilePath}`, storagePrefix);
+        const imageUrl = new URL(`${gcsDestination}/results/${relativeFilePath}`, publicUrl);
+        core.info(`Write source:${file} dest:${target.href} public:${imageUrl.href}`);
 
-        await fsa.write(target, fsa.stream(file), {
+        await fsa.write(target, fsa.readStream(fsa.toUrl(file)), {
           contentType: file.endsWith('.png') ? 'image/png' : undefined,
         });
         return { image_url: imageUrl, alt: '' };
@@ -241,11 +241,11 @@ async function run(): Promise<void> {
     await generateImageGallery(path.resolve(resultsPath, 'index.html'), results);
 
     await fsa.write(
-      fsa.join(storagePrefix, `${gcsDestination}/index.html`),
-      fsa.stream(path.resolve(resultsPath, 'index.html')),
+      new URL(`${gcsDestination}/index.html`, storagePrefix),
+      fsa.readStream(fsa.toUrl(path.resolve(resultsPath, 'index.html'))),
       { contentType: 'text/html' },
     );
-    const galleryUrl = fsa.join(publicUrl, `${gcsDestination}/index.html`);
+    const galleryUrl = new URL(`${gcsDestination}/index.html`, publicUrl);
     // core.endGroup();
 
     core.debug('Saving snapshots and finishing build...');

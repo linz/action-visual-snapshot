@@ -1,17 +1,17 @@
 {
-  "name": "action-visual-snapshot",
+  "name": "@linz/action-visual-snapshot",
   "version": "0.0.1",
   "private": true,
   "description": "GitHub Action to diff images",
-  "main": "lib/main.js",
+  "type": "module",
   "scripts": {
-    "build": "tsc --build tsconfig.build.json",
+    "build": "tsc",
     "build-template": "tsx src/template/build.ts",
     "format": "oxfmt . --write",
     "lint": "oxlint . --type-aware --fix && oxfmt . --write",
     "check": "oxlint . --type-aware && oxfmt . --check",
-    "dist": "npm run build-template && npm run build && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
-    "test": "echo 'skip-tests'"
+    "dist": "npm run build-template && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
+    "test": "node --test \"src/**/*.test.ts\""
   },
   "repository": {
     "type": "git",
@@ -31,14 +31,15 @@
     "node-forge": "^0.10.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.936.0",
     "@actions/artifact": "^2.2.1",
     "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",
     "@actions/glob": "^0.1.0",
     "@actions/io": "^1.0.2",
-    "@chunkd/fs": "^8.2.0",
-    "@chunkd/source-aws": "^8.2.0",
+    "@chunkd/fs": "^11.5.1",
+    "@chunkd/fs-aws": "^11.6.1",
     "@types/async-retry": "^1.4.2",
     "@types/ejs": "^3.0.4",
     "@types/pixelmatch": "^5.2.2",
@@ -57,7 +58,7 @@
     "oxfmt": "^0.54.0",
     "oxlint": "^1.69.0",
     "oxlint-tsgolint": "^0.23.0",
-    "tsx": "^4.19.2",
-    "typescript": "4.9.x"
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   }
 }

@@ -818,21 +818,18 @@
             throw new Error('Unknown order of iteration.');
         }
         const u = this.sourceRoot;
-        a.map(
-          function (e) {
-            let r = e.source === null ? null : this._sources.at(e.source);
-            r = o.computeSourceURL(u, r, this._sourceMapURL);
-            return {
-              source: r,
-              generatedLine: e.generatedLine,
-              generatedColumn: e.generatedColumn,
-              originalLine: e.originalLine,
-              originalColumn: e.originalColumn,
-              name: e.name === null ? null : this._names.at(e.name),
-            };
-          },
-          this,
-        ).forEach(e, t);
+        a.map(function (e) {
+          let r = e.source === null ? null : this._sources.at(e.source);
+          r = o.computeSourceURL(u, r, this._sourceMapURL);
+          return {
+            source: r,
+            generatedLine: e.generatedLine,
+            generatedColumn: e.generatedColumn,
+            originalLine: e.originalLine,
+            originalColumn: e.originalColumn,
+            name: e.name === null ? null : this._names.at(e.name),
+          };
+        }, this).forEach(e, t);
       };
       SourceMapConsumer.prototype.allGeneratedPositionsFor = function SourceMapConsumer_allGeneratedPositionsFor(e) {
         const r = o.getArg(e, 'line');
@@ -1433,53 +1430,47 @@
         }
         const u = new i();
         const s = new i();
-        this._mappings.unsortedForEach(
-          function (r) {
-            if (r.source === t && r.originalLine != null) {
-              const i = e.originalPositionFor({ line: r.originalLine, column: r.originalColumn });
-              if (i.source != null) {
-                r.source = i.source;
-                if (n != null) {
-                  r.source = o.join(n, r.source);
-                }
-                if (a != null) {
-                  r.source = o.relative(a, r.source);
-                }
-                r.originalLine = i.line;
-                r.originalColumn = i.column;
-                if (i.name != null) {
-                  r.name = i.name;
-                }
-              }
-            }
-            const l = r.source;
-            if (l != null && !u.has(l)) {
-              u.add(l);
-            }
-            const c = r.name;
-            if (c != null && !s.has(c)) {
-              s.add(c);
-            }
-          },
-          this,
-        );
-        this._sources = u;
-        this._names = s;
-        e.sources.forEach(
-          function (r) {
-            const t = e.sourceContentFor(r);
-            if (t != null) {
+        this._mappings.unsortedForEach(function (r) {
+          if (r.source === t && r.originalLine != null) {
+            const i = e.originalPositionFor({ line: r.originalLine, column: r.originalColumn });
+            if (i.source != null) {
+              r.source = i.source;
               if (n != null) {
-                r = o.join(n, r);
+                r.source = o.join(n, r.source);
               }
               if (a != null) {
-                r = o.relative(a, r);
+                r.source = o.relative(a, r.source);
               }
-              this.setSourceContent(r, t);
+              r.originalLine = i.line;
+              r.originalColumn = i.column;
+              if (i.name != null) {
+                r.name = i.name;
+              }
             }
-          },
-          this,
-        );
+          }
+          const l = r.source;
+          if (l != null && !u.has(l)) {
+            u.add(l);
+          }
+          const c = r.name;
+          if (c != null && !s.has(c)) {
+            s.add(c);
+          }
+        }, this);
+        this._sources = u;
+        this._names = s;
+        e.sources.forEach(function (r) {
+          const t = e.sourceContentFor(r);
+          if (t != null) {
+            if (n != null) {
+              r = o.join(n, r);
+            }
+            if (a != null) {
+              r = o.relative(a, r);
+            }
+            this.setSourceContent(r, t);
+          }
+        }, this);
       };
       SourceMapGenerator.prototype._validateMapping = function SourceMapGenerator_validateMapping(e, r, n, t) {
         if (r && typeof r.line !== 'number' && typeof r.column !== 'number') {
@@ -1560,19 +1551,16 @@
         return s;
       };
       SourceMapGenerator.prototype._generateSourcesContent = function SourceMapGenerator_generateSourcesContent(e, r) {
-        return e.map(
-          function (e) {
-            if (!this._sourcesContents) {
-              return null;
-            }
-            if (r != null) {
-              e = o.relative(r, e);
-            }
-            const n = o.toSetString(e);
-            return Object.prototype.hasOwnProperty.call(this._sourcesContents, n) ? this._sourcesContents[n] : null;
-          },
-          this,
-        );
+        return e.map(function (e) {
+          if (!this._sourcesContents) {
+            return null;
+          }
+          if (r != null) {
+            e = o.relative(r, e);
+          }
+          const n = o.toSetString(e);
+          return Object.prototype.hasOwnProperty.call(this._sourcesContents, n) ? this._sourcesContents[n] : null;
+        }, this);
       };
       SourceMapGenerator.prototype.toJSON = function SourceMapGenerator_toJSON() {
         const e = {
@@ -1629,37 +1617,34 @@
         let s = 1,
           l = 0;
         let c = null;
-        r.eachMapping(
-          function (e) {
-            if (c !== null) {
-              if (s < e.generatedLine) {
-                addMappingWithCode(c, shiftNextLine());
-                s++;
-                l = 0;
-              } else {
-                var r = o[u] || '';
-                const n = r.substr(0, e.generatedColumn - l);
-                o[u] = r.substr(e.generatedColumn - l);
-                l = e.generatedColumn;
-                addMappingWithCode(c, n);
-                c = e;
-                return;
-              }
-            }
-            while (s < e.generatedLine) {
-              t.add(shiftNextLine());
+        r.eachMapping(function (e) {
+          if (c !== null) {
+            if (s < e.generatedLine) {
+              addMappingWithCode(c, shiftNextLine());
               s++;
-            }
-            if (l < e.generatedColumn) {
+              l = 0;
+            } else {
               var r = o[u] || '';
-              t.add(r.substr(0, e.generatedColumn));
-              o[u] = r.substr(e.generatedColumn);
+              const n = r.substr(0, e.generatedColumn - l);
+              o[u] = r.substr(e.generatedColumn - l);
               l = e.generatedColumn;
+              addMappingWithCode(c, n);
+              c = e;
+              return;
             }
-            c = e;
-          },
-          this,
-        );
+          }
+          while (s < e.generatedLine) {
+            t.add(shiftNextLine());
+            s++;
+          }
+          if (l < e.generatedColumn) {
+            var r = o[u] || '';
+            t.add(r.substr(0, e.generatedColumn));
+            o[u] = r.substr(e.generatedColumn);
+            l = e.generatedColumn;
+          }
+          c = e;
+        }, this);
         if (u < o.length) {
           if (c) {
             addMappingWithCode(c, shiftNextLine());
@@ -1687,12 +1672,9 @@
       };
       SourceNode.prototype.add = function SourceNode_add(e) {
         if (Array.isArray(e)) {
-          e.forEach(
-            function (e) {
-              this.add(e);
-            },
-            this,
-          );
+          e.forEach(function (e) {
+            this.add(e);
+          }, this);
         } else if (e[s] || typeof e === 'string') {
           if (e) {
             this.children.push(e);

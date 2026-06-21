@@ -10,7 +10,7 @@ type Params = {
   headSha: string;
   images: {
     alt: string;
-    image_url: string;
+    image_url: URL;
   }[];
   results: {
     baseFilesLength: number;
@@ -18,7 +18,7 @@ type Params = {
     missing: string[];
     added: string[];
   };
-  galleryUrl?: string;
+  galleryUrl?: URL;
 };
 
 export async function finishBuild(body: Params) {
@@ -46,7 +46,7 @@ export async function finishBuild(body: Params) {
     output: {
       title,
       summary: `
-${galleryUrl ? `[View Image Gallery](${galleryUrl})` : ''}
+${galleryUrl ? `[View Image Gallery](${galleryUrl.href})` : ''}
 
 * **${changed.length}** changed snapshots (${unchanged} unchanged)
 * **${missing.length}** missing snapshots
@@ -77,7 +77,12 @@ ${[...added].map((name) => `* ${name}`).join('\n')}
 `
     : ''
 }`,
-      images,
+      images: images.map(({ alt, image_url }) => {
+        return {
+          alt,
+          image_url: image_url.href,
+        };
+      }),
     },
   });
 }

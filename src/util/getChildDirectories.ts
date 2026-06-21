@@ -1,4 +1,4 @@
-import { getDirectoriesToFile } from './getDirectoriesToFile';
+import { getDirectoriesToFile } from './getDirectoriesToFile.ts';
 
 /**
  * Given a base path and a full path to file, we want to find

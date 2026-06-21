@@ -1,6 +1,6 @@
 import type { PNG } from 'pngjs';
 
-export function findChangedPixels(img: PNG) {
+export function findChangedPixels(img: PNG): number[] {
   const { height, width } = img;
   const locations = [];
 

@@ -28,7 +28,7 @@ jobs:
           mkdir -p /tmp/mock-snapshots
           # Replace this with the path to your actual test images
           # cp -r __tests__/fixtures/snapshots/* /tmp/mock-snapshots/
-          
+
       - name: Run Visual Snapshot Action
         id: visual-snapshots-diff
         uses: ./
@@ -45,7 +45,7 @@ jobs:
           # Add custom bash assertions here to verify the action produced the expected diff files
           echo "Checking if results were generated..."
           ls -la /tmp/e2e-results/visual-snapshots-results
-          
+
           # Example: Fail the test if no diff index.html was generated
           if [ ! -f "/tmp/e2e-results/visual-snapshots-results/index.html" ]; then
             echo "Expected index.html was not generated!"
