@@ -1,4 +1,4 @@
-name: e2e-test
+name: e2e
 on:
   pull_request:
   push:
@@ -8,12 +8,11 @@ jobs:
   e2e-diff:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+
+      - uses: actions/setup-node@v6
         with:
           node-version-file: .node-version
 
