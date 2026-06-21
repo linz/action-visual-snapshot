@@ -1,6 +1,6 @@
-import * as core from '@actions/core';
 import * as artifact from '@actions/artifact';
-import {exec} from '@actions/exec';
+import * as core from '@actions/core';
+import { exec } from '@actions/exec';
 import * as glob from '@actions/glob';
 
 type DownloadSnapshotsParams = {
@@ -8,10 +8,7 @@ type DownloadSnapshotsParams = {
   artifactName: string;
 };
 
-export async function downloadSnapshots({
-  artifactName,
-  rootDirectory,
-}: DownloadSnapshotsParams) {
+export async function downloadSnapshots({ artifactName, rootDirectory }: DownloadSnapshotsParams) {
   const description = `downloadSnapshots: ${artifactName}`;
 
   core.startGroup(description);
@@ -32,12 +29,9 @@ export async function downloadSnapshots({
   // need to unzip everything now
   await exec('ls', [rootDirectory]);
 
-  const tarGlobber = await glob.create(
-    `${rootDirectory}/${artifactName}/snap*.tar.gz`,
-    {
-      followSymbolicLinks: false,
-    }
-  );
+  const tarGlobber = await glob.create(`${rootDirectory}/${artifactName}/snap*.tar.gz`, {
+    followSymbolicLinks: false,
+  });
   const tarFiles = await tarGlobber.glob();
 
   // need to unzip everything now

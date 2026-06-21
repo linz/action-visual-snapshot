@@ -1,13 +1,13 @@
-import {PNG} from 'pngjs';
+import { PNG } from 'pngjs';
 
 /**
  * Creates a combined diff of @file1 and @file2 and writes to disk
  *
  */
 export async function getCombinedDiff(img1: PNG, img2: PNG, diff: PNG) {
-  const {width, height} = diff;
+  const { width, height } = diff;
   const combinedWidth = width * 3;
-  const combined = new PNG({width: combinedWidth, height});
+  const combined = new PNG({ width: combinedWidth, height });
   const images = [img1, img2, diff];
 
   for (let y = 0; y < height; y++) {

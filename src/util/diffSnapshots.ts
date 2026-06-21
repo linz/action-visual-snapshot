@@ -1,15 +1,14 @@
+import { promises as fs } from 'fs';
 import path from 'path';
 
 import * as core from '@actions/core';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
 
-import {PixelmatchOptions} from '@app/types';
-
-import {createDiff} from './createDiff';
-import {multiCompare} from './multiCompare';
-import {getChildDirectories} from './getChildDirectories';
-import {promises as fs} from 'fs';
+import type { PixelmatchOptions } from '../types.ts';
+import { createDiff } from './createDiff';
+import { getChildDirectories } from './getChildDirectories';
+import { multiCompare } from './multiCompare';
 
 const pngGlob = '/**/*.png';
 
@@ -60,9 +59,9 @@ export async function diffSnapshots({
 
   // globs
   const [baseGlobber, currentGlobber, mergeBaseGlobber] = await Promise.all([
-    glob.create(`${basePath}${pngGlob}`, {followSymbolicLinks: false}),
-    glob.create(`${currentPath}${pngGlob}`, {followSymbolicLinks: false}),
-    glob.create(`${mergeBasePath}${pngGlob}`, {followSymbolicLinks: false}),
+    glob.create(`${basePath}${pngGlob}`, { followSymbolicLinks: false }),
+    glob.create(`${currentPath}${pngGlob}`, { followSymbolicLinks: false }),
+    glob.create(`${mergeBasePath}${pngGlob}`, { followSymbolicLinks: false }),
   ]);
 
   const [baseFiles, currentFiles, mergeBaseFiles] = await Promise.all([
@@ -88,16 +87,14 @@ export async function diffSnapshots({
     core.warning('No snapshots found for current branch');
   }
 
-  baseFiles.forEach(absoluteFile => {
+  baseFiles.forEach((absoluteFile) => {
     const file = path.relative(basePath, absoluteFile);
     baseSnapshots.add(file);
     missingSnapshots.add(file);
   });
 
   // index merge base files as well
-  const mergeBaseSnapshots = new Set(
-    mergeBaseFiles.map(absolute => path.relative(mergeBasePath, absolute))
-  );
+  const mergeBaseSnapshots = new Set(mergeBaseFiles.map((absolute) => path.relative(mergeBasePath, absolute)));
 
   // Since we recurse in the directories looking for pngs, we need to replicate
   // directory structure in the diff directory
@@ -122,11 +119,11 @@ export async function diffSnapshots({
     outputNewPath,
     outputMissingPath,
   ]) {
-    console.log('Mkdir', {base});
+    console.log('Mkdir', { base });
 
-    await fs.mkdir(base, {recursive: true});
+    await fs.mkdir(base, { recursive: true });
 
-    for (const childPath of [...childPaths]) {
+    for (const childPath of childPaths) {
       console.log('Mkdir', path.resolve(base, childPath));
 
       try {
@@ -142,7 +139,7 @@ export async function diffSnapshots({
   // face OOM issues
   for (const absoluteFile of currentFiles) {
     const file = path.relative(currentPath, absoluteFile);
-    console.log('Diff', {absoluteFile, file});
+    console.log('Diff', { absoluteFile, file });
 
     currentSnapshots.add(file);
 
@@ -174,13 +171,7 @@ export async function diffSnapshots({
             branchHead,
             pixelmatchOptions,
           });
-          isDiff = await createDiff(
-            file,
-            outputDiffPath,
-            baseHead,
-            branchHead,
-            pixelmatchOptions
-          );
+          isDiff = await createDiff(file, outputDiffPath, baseHead, branchHead, pixelmatchOptions);
         }
 
         if (isDiff) {
@@ -202,13 +193,13 @@ export async function diffSnapshots({
       newSnapshots.add(file);
     }
 
-    console.log('DiffDone', {absoluteFile, file});
+    console.log('DiffDone', { absoluteFile, file });
   }
 
   // TODO: Track cases where snapshot exists in `mergeBaseSnapshots`, but not
   // in current and base
 
-  missingSnapshots.forEach(file => {
+  missingSnapshots.forEach((file) => {
     if (mergeBaseFiles.length && !mergeBaseSnapshots.has(file)) {
       // It's possible this isn't desirable, but seems likely that this snapshot was
       // added in latest base.
@@ -218,7 +209,7 @@ export async function diffSnapshots({
     }
   });
 
-  newSnapshots.forEach(file => {
+  newSnapshots.forEach((file) => {
     if (mergeBaseSnapshots.has(file)) {
       // It's possible this isn't desirable, but seems likely that this snapshot was
       // removed in latest base.
@@ -230,22 +221,14 @@ export async function diffSnapshots({
 
   await Promise.all(
     [...missingSnapshots].map(
-      async file =>
-        await io.cp(
-          path.resolve(basePath, file),
-          path.resolve(outputMissingPath, file)
-        )
-    )
+      async (file) => await io.cp(path.resolve(basePath, file), path.resolve(outputMissingPath, file)),
+    ),
   );
 
   await Promise.all(
     [...newSnapshots].map(
-      async file =>
-        await io.cp(
-          path.resolve(currentPath, file),
-          path.resolve(outputNewPath, file)
-        )
-    )
+      async (file) => await io.cp(path.resolve(currentPath, file), path.resolve(outputNewPath, file)),
+    ),
   );
 
   return {

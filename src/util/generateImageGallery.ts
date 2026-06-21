@@ -1,4 +1,4 @@
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 
 import ejs from 'ejs';
 
@@ -9,7 +9,7 @@ export async function generateImageGallery(
     changed: string[];
     missing?: string[];
     added?: string[];
-  }
+  },
 ) {
   const template = require('../template').default;
   const html = ejs.render(template.html, {

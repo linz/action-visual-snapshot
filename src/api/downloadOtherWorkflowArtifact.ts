@@ -1,11 +1,11 @@
 /* eslint-env node */
 import path from 'path';
 
-import {exec} from '@actions/exec';
 import * as core from '@actions/core';
-import * as github from '@actions/github';
-import * as io from '@actions/io';
+import { exec } from '@actions/exec';
+import type * as github from '@actions/github';
 import * as glob from '@actions/glob';
+import * as io from '@actions/io';
 
 type DownloadArtifactParams = {
   owner: string;
@@ -51,7 +51,7 @@ async function download(url: string, file: string, dest: string) {
   await exec('ls', ['-la', dest]);
 
   core.endGroup();
-  return {downloadPath: dest, artifactName: file};
+  return { downloadPath: dest, artifactName: file };
 }
 /**
  * Use GitHub API to fetch artifact download url, then
@@ -59,7 +59,7 @@ async function download(url: string, file: string, dest: string) {
  */
 export async function downloadOtherWorkflowArtifact(
   octokit: ReturnType<typeof github.getOctokit>,
-  {owner, repo, artifactId, downloadPath}: DownloadArtifactParams
+  { owner, repo, artifactId, downloadPath }: DownloadArtifactParams,
 ) {
   const artifact = await octokit.actions.downloadArtifact({
     owner,

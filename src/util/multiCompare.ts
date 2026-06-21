@@ -1,11 +1,13 @@
-import {PixelmatchOptions} from '@app/types';
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
-import {PNG} from 'pngjs';
-import {copyPixel} from './copyPixel';
-import {fileToPng} from './fileToPng';
-import {findChangedPixels} from './findChangedPixels';
-import {getDiff} from './getDiff';
+
+import { PNG } from 'pngjs';
+
+import type { PixelmatchOptions } from '../types.ts';
+import { copyPixel } from './copyPixel';
+import { fileToPng } from './fileToPng';
+import { findChangedPixels } from './findChangedPixels';
+import { getDiff } from './getDiff';
 
 type Options = {
   snapshotName: string;
@@ -28,11 +30,7 @@ export async function multiCompare({
 }: Options) {
   const promises = [];
 
-  const [
-    baseHeadImage,
-    branchHeadMergedImage,
-    branchBaseImage,
-  ] = await Promise.all([
+  const [baseHeadImage, branchHeadMergedImage, branchBaseImage] = await Promise.all([
     fileToPng(baseHead),
     fileToPng(branchHead),
     fileToPng(branchBase),
@@ -41,13 +39,14 @@ export async function multiCompare({
   try {
     // diff baseHeadImage and branchBaseImage -- alpha must be 0 so that we can
     // correctly identify the diffed pixels
-    const {
-      result: baseDiffResult,
-      diff: branchBaseBaseHeadDiffImage,
-    } = await getDiff(branchBaseImage, baseHeadImage, {
-      ...pixelmatchOptions,
-      alpha: 0,
-    });
+    const { result: baseDiffResult, diff: branchBaseBaseHeadDiffImage } = await getDiff(
+      branchBaseImage,
+      baseHeadImage,
+      {
+        ...pixelmatchOptions,
+        alpha: 0,
+      },
+    );
 
     if (baseDiffResult > 0) {
       // Find pixel locations that have changed from branch base ---> head
@@ -55,37 +54,23 @@ export async function multiCompare({
 
       // Apply pixel locations from head snapshot to branch head snapshot
       // `branchHeadMergedImage` is now merged between baseHead and branchHeadImage
-      changedPixels.forEach(idx => {
+      changedPixels.forEach((idx) => {
         copyPixel(idx, baseHeadImage, branchHeadMergedImage);
       });
 
       // Output merged image to fs
-      promises.push(
-        fs.writeFile(
-          path.resolve(outputMergedPath, snapshotName),
-          PNG.sync.write(branchHeadMergedImage)
-        )
-      );
+      promises.push(fs.writeFile(path.resolve(outputMergedPath, snapshotName), PNG.sync.write(branchHeadMergedImage)));
     }
   } catch (err) {
     // Can't 3-way compare
     console.log(err);
   }
 
-  const {result, diff} = await getDiff(
-    baseHeadImage,
-    branchHeadMergedImage,
-    pixelmatchOptions
-  );
+  const { result, diff } = await getDiff(baseHeadImage, branchHeadMergedImage, pixelmatchOptions);
 
   if (result > 0) {
     // TODO detect conflicts
-    promises.push(
-      fs.writeFile(
-        path.resolve(outputDiffPath, snapshotName),
-        PNG.sync.write(diff)
-      )
-    );
+    promises.push(fs.writeFile(path.resolve(outputDiffPath, snapshotName), PNG.sync.write(diff)));
   }
 
   await Promise.all(promises);

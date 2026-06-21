@@ -1,4 +1,4 @@
-import * as github from '@actions/github';
+import type * as github from '@actions/github';
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -22,20 +22,19 @@ type Params = {
 };
 
 export async function finishBuild(body: Params) {
-  const {owner, repo, galleryUrl, id, images, results, octokit} = body;
-  const {baseFilesLength, changed, missing, added} = results;
+  const { owner, repo, galleryUrl, id, images, results, octokit } = body;
+  const { baseFilesLength, changed, missing, added } = results;
   const unchanged = baseFilesLength - (changed.length + missing.length);
 
   const totalChanged = changed.length + missing.length;
-  const conclusion =
-    totalChanged > 0 ? 'action_required' : added.length ? 'neutral' : 'success';
+  const conclusion = totalChanged > 0 ? 'action_required' : added.length ? 'neutral' : 'success';
 
   const title =
     totalChanged > 0
       ? `${totalChanged} snapshots need review`
       : added.length
-      ? `${added.length} new snapshots`
-      : 'No snapshot changes detected';
+        ? `${added.length} new snapshots`
+        : 'No snapshot changes detected';
 
   return await octokit.checks.update({
     check_run_id: id,
@@ -58,7 +57,7 @@ ${!changed.length && !missing.length && !added.length ? '## No changes' : ''}
 ${
   changed.length
     ? `## Changed snapshots
-${[...changed].map(name => `* ${name}`).join('\n')}
+${[...changed].map((name) => `* ${name}`).join('\n')}
 `
     : ''
 }
@@ -66,7 +65,7 @@ ${[...changed].map(name => `* ${name}`).join('\n')}
 ${
   missing.length
     ? `## Missing snapshots
-${[...missing].map(name => `* ${name}`).join('\n')}
+${[...missing].map((name) => `* ${name}`).join('\n')}
 `
     : ''
 }
@@ -74,7 +73,7 @@ ${[...missing].map(name => `* ${name}`).join('\n')}
 ${
   added.length
     ? `## New snapshots
-${[...added].map(name => `* ${name}`).join('\n')}
+${[...added].map((name) => `* ${name}`).join('\n')}
 `
     : ''
 }`,

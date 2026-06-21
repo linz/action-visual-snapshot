@@ -1,18 +1,13 @@
+import * as core from '@actions/core';
+import type * as github from '@actions/github';
 import retry from 'async-retry';
 
-import * as core from '@actions/core';
-import * as github from '@actions/github';
+import type { Await } from '../types.ts';
+import { downloadOtherWorkflowArtifact } from './downloadOtherWorkflowArtifact';
+import type { GetArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow';
+import { getArtifactsForBranchAndWorkflow } from './getArtifactsForBranchAndWorkflow';
 
-import {
-  getArtifactsForBranchAndWorkflow,
-  GetArtifactsForBranchAndWorkflow,
-} from './getArtifactsForBranchAndWorkflow';
-import {downloadOtherWorkflowArtifact} from './downloadOtherWorkflowArtifact';
-import {Await} from '@app/types';
-
-type GetArtifactsForBranchAndWorkflowType = Await<
-  ReturnType<typeof getArtifactsForBranchAndWorkflow>
-> | null;
+type GetArtifactsForBranchAndWorkflowType = Await<ReturnType<typeof getArtifactsForBranchAndWorkflow>> | null;
 
 type RetrieveBaseSnapshotsParams = {
   basePath: string;
@@ -32,7 +27,7 @@ export async function retrieveBaseSnapshots(
     basePath,
     mergeBasePath,
     mergeBaseSha,
-  }: RetrieveBaseSnapshotsParams
+  }: RetrieveBaseSnapshotsParams,
 ) {
   const baseArtifacts = await getArtifactsForBranchAndWorkflow(octokit, {
     owner,
@@ -62,20 +57,18 @@ export async function retrieveBaseSnapshots(
         downloadPath: basePath,
       }),
     {
-      onRetry: err => {
+      onRetry: (err) => {
         console.log(workflowRun); // eslint-disable-line no-console
         console.error(err); // eslint-disable-line no-console
       },
-    }
+    },
   );
 
   let mergeBaseArtifacts: GetArtifactsForBranchAndWorkflowType = null;
 
   core.startGroup('workflowRun');
   core.debug(`Merge base SHA: ${mergeBaseSha}`);
-  core.debug(
-    `workflowRun head sha (i.e. latest master): ${workflowRun.head_sha}`
-  );
+  core.debug(`workflowRun head sha (i.e. latest master): ${workflowRun.head_sha}`);
   core.debug(`!!! workflowRun:
 ${JSON.stringify(workflowRun, null, 2)}`);
   core.endGroup();
@@ -96,15 +89,15 @@ ${JSON.stringify(workflowRun, null, 2)}`);
           await downloadOtherWorkflowArtifact(octokit, {
             owner,
             repo,
-            artifactId: mergeBaseArtifacts!.artifact.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+            artifactId: mergeBaseArtifacts.artifact.id, // eslint-disable-line @typescript-eslint/no-non-null-assertion
             downloadPath: mergeBasePath,
           }),
         {
-          onRetry: err => {
+          onRetry: (err) => {
             console.log(workflowRun); // eslint-disable-line no-console
             console.error(err); // eslint-disable-line
           },
-        }
+        },
       );
     }
   } else {

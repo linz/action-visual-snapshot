@@ -1,4 +1,4 @@
-import * as github from '@actions/github';
+import type * as github from '@actions/github';
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -13,7 +13,7 @@ type Params = {
 /**
  * Fails a build due to another error
  */
-export async function failBuild({octokit, ...body}: Params) {
+export async function failBuild({ octokit, ...body }: Params) {
   const failureBody = {
     status: 'completed',
     conclusion: 'failure',
@@ -21,9 +21,9 @@ export async function failBuild({octokit, ...body}: Params) {
     summary: 'There was an error processing the snapshots',
   };
 
-  const {owner, repo, id} = body;
+  const { owner, repo, id } = body;
 
-  const {title, summary, ...checkBody} = failureBody;
+  const { title, summary, ...checkBody } = failureBody;
 
   // @ts-ignore
   return await octokit.checks.update({

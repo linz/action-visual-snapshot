@@ -1,5 +1,5 @@
 /* eslint-env node */
-import {PNG} from 'pngjs';
+import type { PNG } from 'pngjs';
 
 export function copyPixel(idx: number, from: PNG, to: PNG): void {
   to.data[idx] = from.data[idx];

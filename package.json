@@ -7,8 +7,9 @@
   "scripts": {
     "build": "tsc --build tsconfig.build.json",
     "build-template": "tsx src/template/build.ts",
-    "format": "prettier --write **/*.ts",
-    "lint": "eslint src/**/*.ts",
+    "format": "oxfmt . --write",
+    "lint": "oxlint . --type-aware --fix && oxfmt . --write",
+    "check": "oxlint . --type-aware && oxfmt . --check",
     "dist": "npm run build-template && npm run build && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
     "test": "echo 'skip-tests'"
   },
@@ -52,7 +53,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.17.17",
-
     "esbuild": "^0.28.1",
     "oxfmt": "^0.54.0",
     "oxlint": "^1.69.0",

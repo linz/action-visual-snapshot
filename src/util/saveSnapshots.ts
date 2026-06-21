@@ -1,27 +1,20 @@
-import * as io from '@actions/io';
-import * as core from '@actions/core';
 import * as artifact from '@actions/artifact';
-import {exec} from '@actions/exec';
+import * as core from '@actions/core';
+import { exec } from '@actions/exec';
 import * as glob from '@actions/glob';
-
-import {v4 as uuidv4} from 'uuid';
+import * as io from '@actions/io';
+import { v4 as uuidv4 } from 'uuid';
 
 type SaveSnapshotsParams = {
   rootDirectory: string;
   artifactName: string;
 };
 
-async function _save({rootDirectory, artifactName}: SaveSnapshotsParams) {
+async function _save({ rootDirectory, artifactName }: SaveSnapshotsParams) {
   const artifactClient = new artifact.DefaultArtifactClient();
 
   await io.mkdirP('/tmp/snaps');
-  await exec('tar', [
-    'czf',
-    `/tmp/snaps/snap-${uuidv4()}.tar.gz`,
-    '-C',
-    rootDirectory,
-    '.',
-  ]);
+  await exec('tar', ['czf', `/tmp/snaps/snap-${uuidv4()}.tar.gz`, '-C', rootDirectory, '.']);
 
   const tarGlobber = await glob.create('/tmp/snaps/*.tar.gz', {
     followSymbolicLinks: false,
@@ -29,11 +22,7 @@ async function _save({rootDirectory, artifactName}: SaveSnapshotsParams) {
 
   const tarFiles = await tarGlobber.glob();
 
-  const result = await artifactClient.uploadArtifact(
-    artifactName,
-    tarFiles,
-    '/tmp/snaps'
-  );
+  const result = await artifactClient.uploadArtifact(artifactName, tarFiles, '/tmp/snaps');
   return result;
 }
 
@@ -42,16 +31,13 @@ async function _save({rootDirectory, artifactName}: SaveSnapshotsParams) {
  *
  * GHA has a tendency to fail with `ECONNRESET`, in this case retry up to 5 times.
  */
-export async function saveSnapshots({
-  artifactName,
-  rootDirectory,
-}: SaveSnapshotsParams) {
+export async function saveSnapshots({ artifactName, rootDirectory }: SaveSnapshotsParams) {
   core.startGroup('saveSnapshots');
   let retries = 5;
 
   while (retries > 0) {
     try {
-      const result = await _save({artifactName, rootDirectory});
+      const result = await _save({ artifactName, rootDirectory });
       core.endGroup();
       return result;
     } catch (err) {

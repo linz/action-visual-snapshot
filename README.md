@@ -7,46 +7,48 @@ This is a GitHub action that compares 2-3 sets of images and produces a diff usi
 There are two steps required in your GitHub workflow. First, upload your snapshots as GitHub Action artifact. `path` needs to reference the path where your snapshots are saved and `name` is the name of the artifact for GitHub.
 
 ```yml
-  - name: Save snapshots
-    if: always()
-    uses: actions/upload-artifact@v2
-    with:
-      save-only: true
-      path: .artifacts/visual-snapshots
+- name: Save snapshots
+  if: always()
+  uses: actions/upload-artifact@v2
+  with:
+    save-only: true
+    path: .artifacts/visual-snapshots
 ```
 
 Then you'll need to run the action to compare the snapshots (`gcs-bucket` and `gcp-service-account-key`
 are optional and will upload your images to the bucket if specified):
 
 ```yml
-    visual-diff:
-      if: ${{ github.ref != 'refs/heads/master' }}
-      needs: acceptance
-      runs-on: ubuntu-16.04
+visual-diff:
+  if: ${{ github.ref != 'refs/heads/master' }}
+  needs: acceptance
+  runs-on: ubuntu-16.04
 
-      steps:
-        - name: Diff snapshots
-          id: visual-snapshots-diff
-          uses: getsentry/action-visual-snapshot@v1
-          with:
-            gcs-bucket: 'sentry-visual-snapshots'
-            gcp-service-account-key: ${{ secrets.SNAPSHOT_GOOGLE_SERVICE_ACCOUNT_KEY }}
+  steps:
+    - name: Diff snapshots
+      id: visual-snapshots-diff
+      uses: getsentry/action-visual-snapshot@v1
+      with:
+        gcs-bucket: 'sentry-visual-snapshots'
+        gcp-service-account-key: ${{ secrets.SNAPSHOT_GOOGLE_SERVICE_ACCOUNT_KEY }}
 ```
 
 ### Multiple diffs
+
 You can also have multiple sets of diff actions with some configuration inputs
 
 ```yaml
-  - name: Diff snapshots
-    id: visual-snapshots-diff
-    uses: getsentry/action-visual-snapshot@v1
-    with:
-      snapshot-path: .artifacts/visual-snapshots-jest
-      action-name: Jest Snapshots
-      artifact-name: visual-snapshots-jest
+- name: Diff snapshots
+  id: visual-snapshots-diff
+  uses: getsentry/action-visual-snapshot@v1
+  with:
+    snapshot-path: .artifacts/visual-snapshots-jest
+    action-name: Jest Snapshots
+    artifact-name: visual-snapshots-jest
 ```
 
 ## Contributing
+
 WIP
 
 ### Updating Image Gallery Template
@@ -61,11 +63,12 @@ yarn dev:gallery && open example_gallery/index.html
 Files changes to `src/template/index.ejs` will rebuild the `example_gallery/index.html` file (although you currently
 need to save the file twice).
 
-
 ### Publishing
+
 Actions are run from GitHub repos so we will checkin the packed dist folder, this is done by GitHub Actions for all branches.
 
 To do this manually, run [ncc](https://github.com/zeit/ncc) and push the results:
+
 ```bash
 $ yarn dist
 $ git add dist

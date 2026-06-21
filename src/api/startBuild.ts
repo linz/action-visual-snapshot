@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import * as github from '@actions/github';
+import type * as github from '@actions/github';
 
 type Octokit = ReturnType<typeof github.getOctokit>;
 
@@ -14,10 +14,8 @@ type Params = {
 
 export async function startBuild(opt: Params): Promise<any> {
   core.startGroup('Starting build using GitHub API directly...');
-  core.info(
-    `CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`
-  );
-  const {data: check} = await opt.octokit.checks.create({
+  core.info(`CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`);
+  const { data: check } = await opt.octokit.checks.create({
     owner: opt.owner,
     repo: opt.repo,
     head_sha: opt.headSha,

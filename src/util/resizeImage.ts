@@ -1,14 +1,14 @@
-import {PNG} from 'pngjs';
+import { PNG } from 'pngjs';
 
 export function resizeImage(img: PNG, width: number, height: number) {
-  const {width: sourceWidth, height: sourceHeight} = img;
+  const { width: sourceWidth, height: sourceHeight } = img;
 
   // return if w/h is the same
   if (sourceWidth === width && sourceHeight === height) {
     return img;
   }
 
-  const newImage = new PNG({width, height});
+  const newImage = new PNG({ width, height });
   // Iterate over pixels of target image width/height and copy pixels
   // from base image. If beyond dimensions of original image, then
   // make a transparent pixel

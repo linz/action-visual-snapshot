@@ -1,10 +1,10 @@
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
-import {PNG} from 'pngjs';
 
-import {PixelmatchOptions} from '@app/types';
+import { PNG } from 'pngjs';
 
-import {getDiff} from './getDiff';
+import type { PixelmatchOptions } from '../types.ts';
+import { getDiff } from './getDiff';
 
 /**
  * Creates a combined diff of @file1 and @file2 and writes to disk
@@ -15,17 +15,14 @@ export async function createDiff(
   output: string,
   file1: string,
   file2: string,
-  pixelmatchOptions?: PixelmatchOptions
+  pixelmatchOptions?: PixelmatchOptions,
 ) {
-  const {result, diff} = await getDiff(file1, file2, pixelmatchOptions);
+  const { result, diff } = await getDiff(file1, file2, pixelmatchOptions);
 
-  console.log({snapshotName, output, result});
+  console.log({ snapshotName, output, result });
   if (result > 0) {
-    await fs.mkdir(output, {recursive: true});
-    await fs.writeFile(
-      path.resolve(output, snapshotName),
-      PNG.sync.write(diff)
-    );
+    await fs.mkdir(output, { recursive: true });
+    await fs.writeFile(path.resolve(output, snapshotName), PNG.sync.write(diff));
   }
 
   return result;

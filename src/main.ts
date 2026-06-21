@@ -1,31 +1,32 @@
+import path from 'path';
+
 /* eslint-env node */
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
-import {fsa} from '@chunkd/fs';
-import path from 'path';
-import {FsAwsS3} from '@chunkd/source-aws';
+import { fsa } from '@chunkd/fs';
+import { FsAwsS3 } from '@chunkd/source-aws';
 import S3 from 'aws-sdk/clients/s3';
-import {downloadOtherWorkflowArtifact} from './api/downloadOtherWorkflowArtifact';
-import {failBuild} from './api/failBuild';
-import {finishBuild} from './api/finishBuild';
-import {retrieveBaseSnapshots} from './api/retrieveBaseSnapshots';
-import {startBuild} from './api/startBuild';
-import {getPixelmatchOptions} from './getPixelmatchOptions';
-import {Await} from './types';
-import {diffSnapshots} from './util/diffSnapshots';
-import {downloadSnapshots} from './util/downloadSnapshots';
-import {generateImageGallery} from './util/generateImageGallery';
-import {saveSnapshots} from './util/saveSnapshots';
 
-const {owner, repo} = github.context.repo;
+import { downloadOtherWorkflowArtifact } from './api/downloadOtherWorkflowArtifact';
+import { failBuild } from './api/failBuild';
+import { finishBuild } from './api/finishBuild';
+import { retrieveBaseSnapshots } from './api/retrieveBaseSnapshots';
+import { startBuild } from './api/startBuild';
+import { getPixelmatchOptions } from './getPixelmatchOptions';
+import type { Await } from './types';
+import { diffSnapshots } from './util/diffSnapshots';
+import { downloadSnapshots } from './util/downloadSnapshots';
+import { generateImageGallery } from './util/generateImageGallery';
+import { saveSnapshots } from './util/saveSnapshots';
+
+const { owner, repo } = github.context.repo;
 const token = core.getInput('github-token');
 const octokit = token && github.getOctokit(token);
-const {GITHUB_WORKSPACE, GITHUB_WORKFLOW} = process.env;
+const { GITHUB_WORKSPACE, GITHUB_WORKFLOW } = process.env;
 const pngGlob = '/**/*.png';
 const shouldSaveOnly = core.getInput('save-only');
-
 
 fsa.register('s3://', new FsAwsS3(new S3()));
 
@@ -55,10 +56,7 @@ async function run(): Promise<void> {
   // Forks do not have `pull_requests` populated...
   const workflowRunPullRequest = workflowRunPayload?.pull_requests?.[0];
 
-  const headSha =
-    pullRequestPayload?.head.sha ||
-    workflowRunPullRequest?.head.sha ||
-    workflowRunPayload?.head_sha;
+  const headSha = pullRequestPayload?.head.sha || workflowRunPullRequest?.head.sha || workflowRunPayload?.head_sha;
   const headRef =
     pullRequestPayload?.head.ref ||
     workflowRunPullRequest?.head.ref ||
@@ -67,9 +65,7 @@ async function run(): Promise<void> {
 
   // TODO: Need a good merge base for forks as neither of the below values will exist (input not included)
   const mergeBaseSha: string =
-    core.getInput('merge-base') ||
-    pullRequestPayload?.base?.sha ||
-    workflowRunPullRequest?.base.sha;
+    core.getInput('merge-base') || pullRequestPayload?.base?.sha || workflowRunPullRequest?.base.sha;
 
   // Forward `results-path` to outputs
   core.startGroup('Set outputs');
@@ -92,11 +88,10 @@ async function run(): Promise<void> {
     }
   } catch (error) {
     handleError(error as Error);
-  } finally {
-    // Only needs to upload snapshots, do not proceed further
-    if (shouldSaveOnly !== 'false') {
-      return;
-    }
+  }
+  // Only needs to upload snapshots, do not proceed further
+  if (shouldSaveOnly !== 'false') {
+    return;
   }
 
   if (!octokit) {
@@ -107,9 +102,7 @@ async function run(): Promise<void> {
 
   // This is intended to only work with pull requests, we should ignore `workflow_run` from pushes
   if (workflowRunPayload?.event === 'push') {
-    core.debug(
-      'Push event triggered `workflow_run`... skipping as this only works for PRs'
-    );
+    core.debug('Push event triggered `workflow_run`... skipping as this only works for PRs');
     return;
   }
 
@@ -124,17 +117,16 @@ async function run(): Promise<void> {
   });
 
   try {
-    const [didDownloadLatest, didDownloadMergeBase] =
-      await retrieveBaseSnapshots(octokit, {
-        owner,
-        repo,
-        branch: baseBranch,
-        workflow_id: `${workflowRunPayload?.name || GITHUB_WORKFLOW}.yml`,
-        artifactName,
-        basePath,
-        mergeBasePath,
-        mergeBaseSha,
-      });
+    const [didDownloadLatest, didDownloadMergeBase] = await retrieveBaseSnapshots(octokit, {
+      owner,
+      repo,
+      branch: baseBranch,
+      workflow_id: `${workflowRunPayload?.name || GITHUB_WORKFLOW}.yml`,
+      artifactName,
+      basePath,
+      mergeBasePath,
+      mergeBaseSha,
+    });
 
     if (!didDownloadLatest) {
       // It's possible there are no base snapshots e.g. if these are all
@@ -160,18 +152,16 @@ async function run(): Promise<void> {
         // TODO: fail the build if workflow_run.conclusion != 'success'
         // If this is called from a `workflow_run` event, then assume that the artifacts exist from that workflow run
         // TODO: I'm not sure what happens if there are multiple workflows defined (I assume it would get called multiple times?)
-        const {data} = await octokit.actions.listWorkflowRunArtifacts({
+        const { data } = await octokit.actions.listWorkflowRunArtifacts({
           owner,
           repo,
           run_id: workflowRunPayload?.id,
         });
 
-        const artifact = data.artifacts.find(({name}) => name === artifactName);
+        const artifact = data.artifacts.find(({ name }) => name === artifactName);
 
         if (!artifact) {
-          throw new Error(
-            `Unable to find artifact from ${workflowRunPayload?.html_url}`
-          );
+          throw new Error(`Unable to find artifact from ${workflowRunPayload?.html_url}`);
         }
 
         downloadResp = await downloadOtherWorkflowArtifact(octokit, {
@@ -192,9 +182,7 @@ async function run(): Promise<void> {
 
     if (!current) {
       const err = new Error(
-        !snapshotPath
-          ? '`snapshot-path` input not configured'
-          : 'Unable to download current snapshots'
+        !snapshotPath ? '`snapshot-path` input not configured' : 'Unable to download current snapshots',
       );
       core.error(err);
       throw err;
@@ -209,42 +197,35 @@ async function run(): Promise<void> {
 
     await io.mkdirP(resultsPath);
 
-    const {baseFiles, changedSnapshots, missingSnapshots, newSnapshots} =
-      await diffSnapshots({
-        basePath,
-        mergeBasePath,
-        currentPath,
-        outputPath: resultsPath,
-        pixelmatchOptions,
-      });
+    const { baseFiles, changedSnapshots, missingSnapshots, newSnapshots } = await diffSnapshots({
+      basePath,
+      mergeBasePath,
+      currentPath,
+      outputPath: resultsPath,
+      pixelmatchOptions,
+    });
 
     const resultsGlobber = await glob.create(`${resultsPath}${pngGlob}`, {
       followSymbolicLinks: false,
     });
     const resultsFiles = await resultsGlobber.glob();
 
-    const datePart = new Date().toISOString().slice(0,10).replace(/-/g,'/')
+    const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
     const gcsDestination = `${owner}/${repo}/${datePart}-${headSha}`;
 
     const resultsArtifactUrls = await Promise.all(
-      resultsFiles.map(async file => {
+      resultsFiles.map(async (file) => {
         const relativeFilePath = path.relative(resultsPath, file);
 
-        const target = fsa.join(
-          storagePrefix,
-          `${gcsDestination}/results/${relativeFilePath}`
-        );
-        const imageUrl = fsa.join(
-          publicUrl,
-          `${gcsDestination}/results/${relativeFilePath}`
-        );
+        const target = fsa.join(storagePrefix, `${gcsDestination}/results/${relativeFilePath}`);
+        const imageUrl = fsa.join(publicUrl, `${gcsDestination}/results/${relativeFilePath}`);
         core.info(`Write source:${file} dest:${target} public:${imageUrl}`);
 
         await fsa.write(target, fsa.stream(file), {
           contentType: file.endsWith('.png') ? 'image/png' : undefined,
         });
-        return {image_url: imageUrl, alt: ''};
-      })
+        return { image_url: imageUrl, alt: '' };
+      }),
     );
 
     const changedArray = [...changedSnapshots];
@@ -257,15 +238,12 @@ async function run(): Promise<void> {
     core.endGroup();
 
     core.startGroup('Generating image gallery...');
-    await generateImageGallery(
-      path.resolve(resultsPath, 'index.html'),
-      results
-    );
+    await generateImageGallery(path.resolve(resultsPath, 'index.html'), results);
 
     await fsa.write(
       fsa.join(storagePrefix, `${gcsDestination}/index.html`),
       fsa.stream(path.resolve(resultsPath, 'index.html')),
-      {contentType: 'text/html'}
+      { contentType: 'text/html' },
     );
     const galleryUrl = fsa.join(publicUrl, `${gcsDestination}/index.html`);
     // core.endGroup();
@@ -290,7 +268,7 @@ async function run(): Promise<void> {
     ]);
   } catch (error) {
     handleError(error as Error);
-    failBuild({
+    await failBuild({
       octokit,
       id: buildId,
       owner,
@@ -300,4 +278,7 @@ async function run(): Promise<void> {
   }
 }
 
-run();
+run().catch((e) => {
+  console.error(e);
+  throw e;
+});
