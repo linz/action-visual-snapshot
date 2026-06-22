@@ -10,7 +10,7 @@
     "format": "oxfmt . --write",
     "lint": "oxlint . --type-aware --fix && oxfmt . --write",
     "check": "oxlint . --type-aware && oxfmt . --check",
-    "dist": "npm run build-template && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.js",
+    "dist": "npm run build-template && npx esbuild --bundle --platform=node src/main.ts --outfile=dist/index.cjs",
     "test": "node --test \"src/**/*.test.ts\""
   },
   "repository": {
