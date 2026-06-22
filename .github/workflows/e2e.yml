@@ -27,10 +27,10 @@ jobs:
 
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "Running on PR: using current branch mock snapshot"
-            cp src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/acceptance/
+            cp src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/
           else
             echo "Running on push/master: using base branch mock snapshot"
-            cp src/util/__fixtures__/imgs/base/acceptance/test.png /tmp/mock-snapshots/acceptance/
+            cp src/util/__fixtures__/imgs/base/acceptance/test.png /tmp/mock-snapshots/
           fi
 
       - name: Run Visual Snapshot Action

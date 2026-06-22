@@ -45,7 +45,7 @@ async function run(): Promise<void> {
   const actionName = core.getInput('action-name');
   const snapshotPath: string = core.getInput('snapshot-path');
 
-  const resultsPath = path.resolve(resultsRootPath, 'visual-snapshots-results');
+  const resultsPath = path.resolve(resultsRootPath, 'results');
   const basePath = path.resolve('/tmp/visual-snapshots-base');
   const mergeBasePath = path.resolve('/tmp/visual-snapshop-merge-base');
 
@@ -243,11 +243,11 @@ async function run(): Promise<void> {
     core.endGroup();
 
     core.startGroup('Generating image gallery...');
-    await generateImageGallery(path.resolve(resultsPath, 'index.html'), results);
+    await generateImageGallery(path.resolve(resultsRootPath, 'index.html'), results);
 
     await fsa.write(
       new URL(`${gcsDestination}/index.html`, storagePrefix),
-      fsa.readStream(fsa.toUrl(path.resolve(resultsPath, 'index.html'))),
+      fsa.readStream(fsa.toUrl(path.resolve(resultsRootPath, 'index.html'))),
       { contentType: 'text/html' },
     );
     const galleryUrl = new URL(`${gcsDestination}/index.html`, publicUrl);
