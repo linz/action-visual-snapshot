@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "build-template": "tsx src/template/build.ts",
+    "build-template": "node src/template/build.ts",
     "format": "oxfmt . --write",
     "lint": "oxlint . --type-aware --fix && oxfmt . --write",
     "check": "oxlint . --type-aware && oxfmt . --check",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/getsentry/action-visual-snapshot.git"
+    "url": "git+https://github.com/linz/action-visual-snapshot.git"
   },
   "keywords": [
     "actions",
@@ -44,13 +44,10 @@
     "@types/ejs": "^3.0.4",
     "@types/pixelmatch": "^5.2.2",
     "@types/pngjs": "^3.4.2",
-    "@types/uuid": "^8.3.0",
     "async-retry": "^1.3.1",
-    "aws-sdk": "^2.1141.0",
     "ejs": "^3.1.5",
     "pixelmatch": "^5.2.1",
-    "pngjs": "^5.0.0",
-    "uuid": "^8.3.0"
+    "pngjs": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.17",
@@ -58,7 +55,6 @@
     "oxfmt": "^0.54.0",
     "oxlint": "^1.69.0",
     "oxlint-tsgolint": "^0.23.0",
-    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }

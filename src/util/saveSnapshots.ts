@@ -1,9 +1,10 @@
+import { randomUUID } from 'node:crypto';
+
 import * as artifact from '@actions/artifact';
 import * as core from '@actions/core';
 import { exec } from '@actions/exec';
 import * as glob from '@actions/glob';
 import * as io from '@actions/io';
-import { v4 as uuidv4 } from 'uuid';
 
 type SaveSnapshotsParams = {
   rootDirectory: string;
@@ -14,7 +15,7 @@ async function _save({ rootDirectory, artifactName }: SaveSnapshotsParams) {
   const artifactClient = new artifact.DefaultArtifactClient();
 
   await io.mkdirP('/tmp/snaps');
-  await exec('tar', ['czf', `/tmp/snaps/snap-${uuidv4()}.tar.gz`, '-C', rootDirectory, '.']);
+  await exec('tar', ['czf', `/tmp/snaps/snap-${randomUUID()}.tar.gz`, '-C', rootDirectory, '.']);
 
   const tarGlobber = await glob.create('/tmp/snaps/*.tar.gz', {
     followSymbolicLinks: false,

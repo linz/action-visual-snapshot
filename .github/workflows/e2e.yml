@@ -23,8 +23,15 @@ jobs:
 
       - name: Setup Mock Snapshots
         run: |
-          mkdir -p /tmp/mock-snapshots
-          cp -r src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/
+          mkdir -p /tmp/mock-snapshots/acceptance
+
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "Running on PR: using current branch mock snapshot"
+            cp src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/acceptance/
+          else
+            echo "Running on push/master: using base branch mock snapshot"
+            cp src/util/__fixtures__/imgs/base/acceptance/test.png /tmp/mock-snapshots/acceptance/
+          fi
 
       - name: Run Visual Snapshot Action
         id: visual-snapshots-diff

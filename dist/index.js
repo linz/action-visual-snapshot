@@ -193,7 +193,7 @@ var require_file_command = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.prepareKeyValueMessage = exports2.issueFileCommand = void 0;
-    var crypto3 = __importStar2(require("crypto"));
+    var crypto2 = __importStar2(require("crypto"));
     var fs7 = __importStar2(require("fs"));
     var os = __importStar2(require("os"));
     var utils_1 = require_utils();
@@ -211,7 +211,7 @@ var require_file_command = __commonJS({
     }
     exports2.issueFileCommand = issueFileCommand;
     function prepareKeyValueMessage(key, value) {
-      const delimiter = `ghadelimiter_${crypto3.randomUUID()}`;
+      const delimiter = `ghadelimiter_${crypto2.randomUUID()}`;
       const convertedValue = (0, utils_1.toCommandValue)(value);
       if (key.includes(delimiter)) {
         throw new Error(`Unexpected input: name should not contain the delimiter "${delimiter}"`);
@@ -955,7 +955,7 @@ var require_util = __commonJS({
     var { InvalidArgumentError } = require_errors();
     var { Blob: Blob2 } = require("buffer");
     var nodeUtil = require("util");
-    var { stringify: stringify2 } = require("querystring");
+    var { stringify } = require("querystring");
     var { headerNameLowerCasedRecord } = require_constants();
     var [nodeMajor, nodeMinor] = process.versions.node.split(".").map((v) => Number(v));
     function nop() {
@@ -970,7 +970,7 @@ var require_util = __commonJS({
       if (url.includes("?") || url.includes("#")) {
         throw new Error('Query params cannot be passed when url already contains "?" or "#".');
       }
-      const stringified = stringify2(queryParams);
+      const stringified = stringify(queryParams);
       if (stringified) {
         url += "?" + stringified;
       }
@@ -3646,11 +3646,11 @@ var require_util2 = __commonJS({
     var assert = require("assert");
     var { isUint8Array } = require("util/types");
     var supportedHashes = [];
-    var crypto3;
+    var crypto2;
     try {
-      crypto3 = require("crypto");
+      crypto2 = require("crypto");
       const possibleRelevantHashes = ["sha256", "sha384", "sha512"];
-      supportedHashes = crypto3.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
+      supportedHashes = crypto2.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
     } catch {
     }
     function responseURL(response) {
@@ -3927,7 +3927,7 @@ var require_util2 = __commonJS({
       }
     }
     function bytesMatch(bytes, metadataList) {
-      if (crypto3 === void 0) {
+      if (crypto2 === void 0) {
         return true;
       }
       const parsedMetadata = parseMetadata2(metadataList);
@@ -3942,7 +3942,7 @@ var require_util2 = __commonJS({
       for (const item of metadata) {
         const algorithm = item.algo;
         const expectedValue = item.hash;
-        let actualValue = crypto3.createHash(algorithm).update(bytes).digest("base64");
+        let actualValue = crypto2.createHash(algorithm).update(bytes).digest("base64");
         if (actualValue[actualValue.length - 1] === "=") {
           if (actualValue[actualValue.length - 2] === "=") {
             actualValue = actualValue.slice(0, -2);
@@ -5288,8 +5288,8 @@ var require_body = __commonJS({
     var { parseMIMEType, serializeAMimeType } = require_dataURL();
     var random;
     try {
-      const crypto3 = require("node:crypto");
-      random = (max) => crypto3.randomInt(0, max);
+      const crypto2 = require("node:crypto");
+      random = (max) => crypto2.randomInt(0, max);
     } catch {
       random = (max) => Math.floor(Math.random(max));
     }
@@ -15585,7 +15585,7 @@ var require_util6 = __commonJS({
         throw new Error("Invalid cookie max-age");
       }
     }
-    function stringify2(cookie) {
+    function stringify(cookie) {
       if (cookie.name.length === 0) {
         return null;
       }
@@ -15650,7 +15650,7 @@ var require_util6 = __commonJS({
     }
     module2.exports = {
       isCTLExcludingHtab,
-      stringify: stringify2,
+      stringify,
       getHeadersList
     };
   }
@@ -15801,7 +15801,7 @@ var require_cookies = __commonJS({
   "node_modules/undici/lib/cookies/index.js"(exports2, module2) {
     "use strict";
     var { parseSetCookie } = require_parse();
-    var { stringify: stringify2, getHeadersList } = require_util6();
+    var { stringify, getHeadersList } = require_util6();
     var { webidl } = require_webidl();
     var { Headers: Headers2 } = require_headers();
     function getCookies(headers) {
@@ -15843,9 +15843,9 @@ var require_cookies = __commonJS({
       webidl.argumentLengthCheck(arguments, 2, { header: "setCookie" });
       webidl.brandCheck(headers, Headers2, { strict: false });
       cookie = webidl.converters.Cookie(cookie);
-      const str = stringify2(cookie);
+      const str = stringify(cookie);
       if (str) {
-        headers.append("Set-Cookie", stringify2(cookie));
+        headers.append("Set-Cookie", stringify(cookie));
       }
     }
     webidl.converters.DeleteCookieAttributes = webidl.dictionaryConverter([
@@ -16341,9 +16341,9 @@ var require_connection = __commonJS({
     channels.open = diagnosticsChannel.channel("undici:websocket:open");
     channels.close = diagnosticsChannel.channel("undici:websocket:close");
     channels.socketError = diagnosticsChannel.channel("undici:websocket:socket_error");
-    var crypto3;
+    var crypto2;
     try {
-      crypto3 = require("crypto");
+      crypto2 = require("crypto");
     } catch {
     }
     function establishWebSocketConnection(url, protocols, ws, onEstablish, options) {
@@ -16362,7 +16362,7 @@ var require_connection = __commonJS({
         const headersList = new Headers2(options.headers)[kHeadersList];
         request.headersList = headersList;
       }
-      const keyValue = crypto3.randomBytes(16).toString("base64");
+      const keyValue = crypto2.randomBytes(16).toString("base64");
       request.headersList.append("sec-websocket-key", keyValue);
       request.headersList.append("sec-websocket-version", "13");
       for (const protocol of protocols) {
@@ -16391,7 +16391,7 @@ var require_connection = __commonJS({
             return;
           }
           const secWSAccept = response.headersList.get("Sec-WebSocket-Accept");
-          const digest = crypto3.createHash("sha1").update(keyValue + uid).digest("base64");
+          const digest = crypto2.createHash("sha1").update(keyValue + uid).digest("base64");
           if (secWSAccept !== digest) {
             failWebsocketConnection(ws, "Incorrect hash received in Sec-WebSocket-Accept header.");
             return;
@@ -16471,9 +16471,9 @@ var require_frame = __commonJS({
   "node_modules/undici/lib/websocket/frame.js"(exports2, module2) {
     "use strict";
     var { maxUnsigned16Bit } = require_constants5();
-    var crypto3;
+    var crypto2;
     try {
-      crypto3 = require("crypto");
+      crypto2 = require("crypto");
     } catch {
     }
     var WebsocketFrameSend = class {
@@ -16482,7 +16482,7 @@ var require_frame = __commonJS({
        */
       constructor(data) {
         this.frameData = data;
-        this.maskKey = crypto3.randomBytes(4);
+        this.maskKey = crypto2.randomBytes(4);
       }
       createFrame(opcode) {
         const bodyLength = this.frameData?.byteLength ?? 0;
@@ -77590,10 +77590,10 @@ var require_uuidUtils = __commonJS({
     "use strict";
     var _a2;
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.randomUUID = randomUUID;
+    exports2.randomUUID = randomUUID2;
     var crypto_1 = require("crypto");
     var uuidFunction = typeof ((_a2 = globalThis === null || globalThis === void 0 ? void 0 : globalThis.crypto) === null || _a2 === void 0 ? void 0 : _a2.randomUUID) === "function" ? globalThis.crypto.randomUUID.bind(globalThis.crypto) : crypto_1.randomUUID;
-    function randomUUID() {
+    function randomUUID2() {
       return uuidFunction();
     }
   }
@@ -87144,7 +87144,7 @@ var require_dist4 = __commonJS({
     var coreXml = require_commonjs11();
     var logger$1 = require_commonjs3();
     var abortController = require_commonjs4();
-    var crypto3 = require("crypto");
+    var crypto2 = require("crypto");
     var coreTracing = require_commonjs6();
     var stream = require("stream");
     var coreLro = require_commonjs12();
@@ -88652,7 +88652,7 @@ ${key}:${decodeURIComponent(lowercaseQueries[key])}`;
        * @param stringToSign -
        */
       computeHMACSHA256(stringToSign) {
-        return crypto3.createHmac("sha256", this.accountKey).update(stringToSign, "utf8").digest("base64");
+        return crypto2.createHmac("sha256", this.accountKey).update(stringToSign, "utf8").digest("base64");
       }
     };
     var AnonymousCredentialPolicy = class extends CredentialPolicy {
@@ -88850,7 +88850,7 @@ ${key}:${decodeURIComponent(lowercaseQueries[key])}`;
           getHeaderValueToSign(request, HeaderConstants.IF_UNMODIFIED_SINCE),
           getHeaderValueToSign(request, HeaderConstants.RANGE)
         ].join("\n") + "\n" + getCanonicalizedHeadersString(request) + getCanonicalizedResourceString(request);
-        const signature = crypto3.createHmac("sha256", options.accountKey).update(stringToSign, "utf8").digest("base64");
+        const signature = crypto2.createHmac("sha256", options.accountKey).update(stringToSign, "utf8").digest("base64");
         request.headers.set(HeaderConstants.AUTHORIZATION, `SharedKey ${options.accountName}:${signature}`);
       }
       function getHeaderValueToSign(request, headerName) {
@@ -102624,7 +102624,7 @@ ${key}:${decodeURIComponent(lowercaseQueries[key])}`;
        * @param stringToSign -
        */
       computeHMACSHA256(stringToSign) {
-        return crypto3.createHmac("sha256", this.key).update(stringToSign, "utf8").digest("base64");
+        return crypto2.createHmac("sha256", this.key).update(stringToSign, "utf8").digest("base64");
       }
     };
     function ipRangeToString(ipRange) {
@@ -110675,7 +110675,7 @@ var require_blob_upload = __commonJS({
     var storage_blob_1 = require_dist4();
     var config_1 = require_config();
     var core10 = __importStar2(require_core());
-    var crypto3 = __importStar2(require("crypto"));
+    var crypto2 = __importStar2(require("crypto"));
     var stream = __importStar2(require("stream"));
     var errors_1 = require_errors4();
     function uploadZipToBlobStorage(authenticatedUploadURL, zipUploadStream) {
@@ -110713,7 +110713,7 @@ var require_blob_upload = __commonJS({
         };
         let sha256Hash = void 0;
         const uploadStream = new stream.PassThrough();
-        const hashStream = crypto3.createHash("sha256");
+        const hashStream = crypto2.createHash("sha256");
         zipUploadStream.pipe(uploadStream);
         zipUploadStream.pipe(hashStream).setEncoding("hex");
         core10.info("Beginning upload of artifact content to blob storage");
@@ -158535,12 +158535,12 @@ var init_template = __esm({
 });
 
 // src/main.ts
-var import_path6 = __toESM(require("path"));
-var core9 = __toESM(require_core());
-var github = __toESM(require_github());
-var glob5 = __toESM(require_glob());
-var io4 = __toESM(require_io());
-var import_client_s33 = __toESM(require_dist_cjs21());
+var import_path6 = __toESM(require("path"), 1);
+var core9 = __toESM(require_core(), 1);
+var github = __toESM(require_github(), 1);
+var glob5 = __toESM(require_glob(), 1);
+var io4 = __toESM(require_io(), 1);
+var import_client_s33 = __toESM(require_dist_cjs21(), 1);
 
 // node_modules/@chunkd/fs/build/src/error.js
 var FsError = class _FsError extends Error {
@@ -159558,11 +159558,11 @@ var FsAwsS3 = class _FsAwsS3 {
 };
 
 // src/api/downloadOtherWorkflowArtifact.ts
-var import_path = __toESM(require("path"));
-var core = __toESM(require_core());
-var import_exec = __toESM(require_exec());
-var glob = __toESM(require_glob());
-var io = __toESM(require_io());
+var import_path = __toESM(require("path"), 1);
+var core = __toESM(require_core(), 1);
+var import_exec = __toESM(require_exec(), 1);
+var glob = __toESM(require_glob(), 1);
+var io = __toESM(require_io(), 1);
 var FILENAME = "visual-snapshots-base.zip";
 async function download(url, file, dest) {
   core.startGroup(`download ${file}`);
@@ -159678,11 +159678,11 @@ ${[...added].map((name) => `* ${name}`).join("\n")}
 }
 
 // src/api/retrieveBaseSnapshots.ts
-var core3 = __toESM(require_core());
-var import_async_retry = __toESM(require_lib4());
+var core3 = __toESM(require_core(), 1);
+var import_async_retry = __toESM(require_lib4(), 1);
 
 // src/api/getArtifactsForBranchAndWorkflow.ts
-var core2 = __toESM(require_core());
+var core2 = __toESM(require_core(), 1);
 var MAX_PAGES = 10;
 var PER_PAGE_LIMIT = 30;
 async function getArtifactsForBranchAndWorkflow(octokit2, { owner: owner2, repo: repo2, workflow_id, branch, commit, artifactName }) {
@@ -159840,7 +159840,7 @@ ${JSON.stringify(workflowRun, null, 2)}`);
 }
 
 // src/api/startBuild.ts
-var core4 = __toESM(require_core());
+var core4 = __toESM(require_core(), 1);
 async function startBuild(opt) {
   core4.startGroup("Starting build using GitHub API directly...");
   core4.info(`CreateCheck repo:${opt.owner}/${opt.repo}#${opt.headSha} name: ${opt.name}`);
@@ -159856,7 +159856,7 @@ async function startBuild(opt) {
 }
 
 // src/getPixelmatchOptions.ts
-var core5 = __toESM(require_core());
+var core5 = __toESM(require_core(), 1);
 var OPTIONS = ["threshold", "includeAA", "alpha", "diffMask"];
 function getPixelmatchOptions() {
   const inputs = Object.fromEntries(OPTIONS.map((option) => [option, core5.getInput(option)]));
@@ -159868,23 +159868,23 @@ function getPixelmatchOptions() {
 
 // src/util/diffSnapshots.ts
 var import_fs5 = require("fs");
-var import_path5 = __toESM(require("path"));
-var core6 = __toESM(require_core());
-var glob2 = __toESM(require_glob());
-var io2 = __toESM(require_io());
+var import_path5 = __toESM(require("path"), 1);
+var core6 = __toESM(require_core(), 1);
+var glob2 = __toESM(require_glob(), 1);
+var io2 = __toESM(require_io(), 1);
 
 // src/util/createDiff.ts
 var import_fs3 = require("fs");
-var import_path2 = __toESM(require("path"));
-var import_pngjs4 = __toESM(require_png());
+var import_path2 = __toESM(require("path"), 1);
+var import_pngjs4 = __toESM(require_png(), 1);
 
 // src/util/getDiff.ts
-var import_pixelmatch = __toESM(require_pixelmatch());
-var import_pngjs3 = __toESM(require_png());
+var import_pixelmatch = __toESM(require_pixelmatch(), 1);
+var import_pngjs3 = __toESM(require_png(), 1);
 
 // src/util/fileToPng.ts
 var import_fs2 = require("fs");
-var import_pngjs = __toESM(require_png());
+var import_pngjs = __toESM(require_png(), 1);
 async function fileToPng(file) {
   return new Promise(
     (resolve2, reject) => (0, import_fs2.createReadStream)(file).pipe(
@@ -159900,7 +159900,7 @@ async function fileToPng(file) {
 }
 
 // src/util/resizeImage.ts
-var import_pngjs2 = __toESM(require_png());
+var import_pngjs2 = __toESM(require_png(), 1);
 function resizeImage(img, width, height) {
   const { width: sourceWidth, height: sourceHeight } = img;
   if (sourceWidth === width && sourceHeight === height) {
@@ -159963,7 +159963,7 @@ async function createDiff(snapshotName, output, file1, file2, pixelmatchOptions)
 }
 
 // src/util/getDirectoriesToFile.ts
-var import_path3 = __toESM(require("path"));
+var import_path3 = __toESM(require("path"), 1);
 function getDirectoriesToFile(from, to) {
   return import_path3.default.relative(from, import_path3.default.dirname(to));
 }
@@ -159977,8 +159977,8 @@ function getChildDirectories(targets) {
 
 // src/util/multiCompare.ts
 var import_fs4 = require("fs");
-var import_path4 = __toESM(require("path"));
-var import_pngjs5 = __toESM(require_png());
+var import_path4 = __toESM(require("path"), 1);
+var import_pngjs5 = __toESM(require_png(), 1);
 
 // src/util/copyPixel.ts
 function copyPixel(idx, from, to) {
@@ -160208,10 +160208,10 @@ async function diffSnapshots({
 }
 
 // src/util/downloadSnapshots.ts
-var artifact = __toESM(require_artifact2());
-var core7 = __toESM(require_core());
-var import_exec2 = __toESM(require_exec());
-var glob3 = __toESM(require_glob());
+var artifact = __toESM(require_artifact2(), 1);
+var core7 = __toESM(require_core(), 1);
+var import_exec2 = __toESM(require_exec(), 1);
+var glob3 = __toESM(require_glob(), 1);
 async function downloadSnapshots({ artifactName, rootDirectory }) {
   const description = `downloadSnapshots: ${artifactName}`;
   core7.startGroup(description);
@@ -160241,7 +160241,7 @@ async function downloadSnapshots({ artifactName, rootDirectory }) {
 
 // src/util/generateImageGallery.ts
 var import_fs6 = require("fs");
-var import_ejs = __toESM(require_ejs());
+var import_ejs = __toESM(require_ejs(), 1);
 async function generateImageGallery(target, data) {
   const template2 = (init_template(), __toCommonJS(template_exports)).default;
   const html = import_ejs.default.render(template2.html, {
@@ -160251,69 +160251,16 @@ async function generateImageGallery(target, data) {
 }
 
 // src/util/saveSnapshots.ts
-var artifact2 = __toESM(require_artifact2());
-var core8 = __toESM(require_core());
-var import_exec3 = __toESM(require_exec());
-var glob4 = __toESM(require_glob());
-var io3 = __toESM(require_io());
-
-// node_modules/uuid/dist/esm-node/rng.js
-var import_crypto = __toESM(require("crypto"));
-var rnds8Pool = new Uint8Array(256);
-var poolPtr = rnds8Pool.length;
-function rng() {
-  if (poolPtr > rnds8Pool.length - 16) {
-    import_crypto.default.randomFillSync(rnds8Pool);
-    poolPtr = 0;
-  }
-  return rnds8Pool.slice(poolPtr, poolPtr += 16);
-}
-
-// node_modules/uuid/dist/esm-node/regex.js
-var regex_default = /^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i;
-
-// node_modules/uuid/dist/esm-node/validate.js
-function validate2(uuid) {
-  return typeof uuid === "string" && regex_default.test(uuid);
-}
-var validate_default = validate2;
-
-// node_modules/uuid/dist/esm-node/stringify.js
-var byteToHex = [];
-for (let i5 = 0; i5 < 256; ++i5) {
-  byteToHex.push((i5 + 256).toString(16).substr(1));
-}
-function stringify(arr, offset = 0) {
-  const uuid = (byteToHex[arr[offset + 0]] + byteToHex[arr[offset + 1]] + byteToHex[arr[offset + 2]] + byteToHex[arr[offset + 3]] + "-" + byteToHex[arr[offset + 4]] + byteToHex[arr[offset + 5]] + "-" + byteToHex[arr[offset + 6]] + byteToHex[arr[offset + 7]] + "-" + byteToHex[arr[offset + 8]] + byteToHex[arr[offset + 9]] + "-" + byteToHex[arr[offset + 10]] + byteToHex[arr[offset + 11]] + byteToHex[arr[offset + 12]] + byteToHex[arr[offset + 13]] + byteToHex[arr[offset + 14]] + byteToHex[arr[offset + 15]]).toLowerCase();
-  if (!validate_default(uuid)) {
-    throw TypeError("Stringified UUID is invalid");
-  }
-  return uuid;
-}
-var stringify_default = stringify;
-
-// node_modules/uuid/dist/esm-node/v4.js
-function v42(options, buf, offset) {
-  options = options || {};
-  const rnds = options.random || (options.rng || rng)();
-  rnds[6] = rnds[6] & 15 | 64;
-  rnds[8] = rnds[8] & 63 | 128;
-  if (buf) {
-    offset = offset || 0;
-    for (let i5 = 0; i5 < 16; ++i5) {
-      buf[offset + i5] = rnds[i5];
-    }
-    return buf;
-  }
-  return stringify_default(rnds);
-}
-var v4_default = v42;
-
-// src/util/saveSnapshots.ts
+var import_node_crypto4 = require("node:crypto");
+var artifact2 = __toESM(require_artifact2(), 1);
+var core8 = __toESM(require_core(), 1);
+var import_exec3 = __toESM(require_exec(), 1);
+var glob4 = __toESM(require_glob(), 1);
+var io3 = __toESM(require_io(), 1);
 async function _save({ rootDirectory, artifactName }) {
   const artifactClient = new artifact2.DefaultArtifactClient();
   await io3.mkdirP("/tmp/snaps");
-  await (0, import_exec3.exec)("tar", ["czf", `/tmp/snaps/snap-${v4_default()}.tar.gz`, "-C", rootDirectory, "."]);
+  await (0, import_exec3.exec)("tar", ["czf", `/tmp/snaps/snap-${(0, import_node_crypto4.randomUUID)()}.tar.gz`, "-C", rootDirectory, "."]);
   const tarGlobber = await glob4.create("/tmp/snaps/*.tar.gz", {
     followSymbolicLinks: false
   });
