@@ -122,7 +122,6 @@ export async function diffSnapshots({
     await fs.mkdir(base, { recursive: true });
 
     for (const childPath of childPaths) {
-
       try {
         await io.mkdirP(path.resolve(base, childPath));
       } catch (err) {
@@ -144,7 +143,6 @@ export async function diffSnapshots({
       const branchHead = path.resolve(currentPath, file);
 
       try {
-
         // If merge base snapshot exists, do a 3way diff
         if (mergeBaseSnapshots.has(file)) {
           console.log('CreateDiff:3way');
