@@ -160307,14 +160307,14 @@ async function run() {
   const publicUrl = fsa.toUrl(core9.getInput("storage-url"));
   const actionName = core9.getInput("action-name");
   const snapshotPath = core9.getInput("snapshot-path");
-  const resultsPath = import_path6.default.resolve(resultsRootPath, "visual-snapshots-results");
+  const resultsPath = import_path6.default.resolve(resultsRootPath, "results");
   const basePath = import_path6.default.resolve("/tmp/visual-snapshots-base");
   const mergeBasePath = import_path6.default.resolve("/tmp/visual-snapshop-merge-base");
   const workflowRunPayload = github.context.payload.workflow_run;
   const pullRequestPayload = github.context.payload.pull_request;
   const workflowRunPullRequest = workflowRunPayload?.pull_requests?.[0];
-  const headSha = pullRequestPayload?.head.sha || workflowRunPullRequest?.head.sha || workflowRunPayload?.head_sha;
-  const headRef = pullRequestPayload?.head.ref || workflowRunPullRequest?.head.ref || workflowRunPayload?.head_branch && `${workflowRunPayload?.head_repository?.full_name}/${workflowRunPayload?.head_branch}`;
+  const headSha = pullRequestPayload?.head.sha || workflowRunPullRequest?.head.sha || workflowRunPayload?.head_sha || github.context.sha;
+  const headRef = pullRequestPayload?.head.ref || workflowRunPullRequest?.head.ref || workflowRunPayload?.head_branch && `${workflowRunPayload?.head_repository?.full_name}/${workflowRunPayload?.head_branch}` || github.context.ref;
   const mergeBaseSha = core9.getInput("merge-base") || pullRequestPayload?.base?.sha || workflowRunPullRequest?.base.sha;
   core9.startGroup("Set outputs");
   core9.setOutput("results-path", resultsRootPath);
@@ -160445,10 +160445,10 @@ async function run() {
     };
     core9.endGroup();
     core9.startGroup("Generating image gallery...");
-    await generateImageGallery(import_path6.default.resolve(resultsPath, "index.html"), results);
+    await generateImageGallery(import_path6.default.resolve(resultsRootPath, "index.html"), results);
     await fsa.write(
       new URL(`${gcsDestination}/index.html`, storagePrefix),
-      fsa.readStream(fsa.toUrl(import_path6.default.resolve(resultsPath, "index.html"))),
+      fsa.readStream(fsa.toUrl(import_path6.default.resolve(resultsRootPath, "index.html"))),
       { contentType: "text/html" }
     );
     const galleryUrl = new URL(`${gcsDestination}/index.html`, publicUrl);

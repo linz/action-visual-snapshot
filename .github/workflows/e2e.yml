@@ -27,10 +27,10 @@ jobs:
 
           if [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "Running on PR: using current branch mock snapshot"
-            cp src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/acceptance/
+            cp src/util/__fixtures__/imgs/current/acceptance/test.png /tmp/mock-snapshots/
           else
             echo "Running on push/master: using base branch mock snapshot"
-            cp src/util/__fixtures__/imgs/base/acceptance/test.png /tmp/mock-snapshots/acceptance/
+            cp src/util/__fixtures__/imgs/base/acceptance/test.png /tmp/mock-snapshots/
           fi
 
       - name: Run Visual Snapshot Action
@@ -48,10 +48,10 @@ jobs:
         run: |
           # Add custom bash assertions here to verify the action produced the expected diff files
           echo "Checking if results were generated..."
-          ls -la /tmp/e2e-results/visual-snapshots-results
+          ls -laR /tmp/e2e-results/
 
           # Example: Fail the test if no diff index.html was generated
-          if [ ! -f "/tmp/e2e-results/visual-snapshots-results/index.html" ]; then
+          if [ ! -f "/tmp/e2e-results/index.html" ]; then
             echo "Expected index.html was not generated!"
             exit 1
           fi
