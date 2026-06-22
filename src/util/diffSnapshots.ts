@@ -119,12 +119,9 @@ export async function diffSnapshots({
     outputNewPath,
     outputMissingPath,
   ]) {
-    console.log('Mkdir', { base });
-
     await fs.mkdir(base, { recursive: true });
 
     for (const childPath of childPaths) {
-      console.log('Mkdir', path.resolve(base, childPath));
 
       try {
         await io.mkdirP(path.resolve(base, childPath));
@@ -134,12 +131,11 @@ export async function diffSnapshots({
     }
   }
 
-  // Diff snapshots against base branch
-  // This is to make sure we run the above tasks serially, otherwise we will
-  // face OOM issues
   for (const absoluteFile of currentFiles) {
     const file = path.relative(currentPath, absoluteFile);
-    console.log('Diff', { absoluteFile, file });
+    console.time(absoluteFile);
+
+    let isDiff: number | string = 'unknown';
 
     currentSnapshots.add(file);
 
@@ -148,7 +144,6 @@ export async function diffSnapshots({
       const branchHead = path.resolve(currentPath, file);
 
       try {
-        let isDiff;
 
         // If merge base snapshot exists, do a 3way diff
         if (mergeBaseSnapshots.has(file)) {
@@ -193,7 +188,7 @@ export async function diffSnapshots({
       newSnapshots.add(file);
     }
 
-    console.log('DiffDone', { absoluteFile, file });
+    console.timeEnd(absoluteFile);
   }
 
   // TODO: Track cases where snapshot exists in `mergeBaseSnapshots`, but not
