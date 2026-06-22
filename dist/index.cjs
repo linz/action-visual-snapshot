@@ -160115,10 +160115,8 @@ async function diffSnapshots({
     outputNewPath,
     outputMissingPath
   ]) {
-    console.log("Mkdir", { base });
     await import_fs5.promises.mkdir(base, { recursive: true });
     for (const childPath of childPaths) {
-      console.log("Mkdir", import_path5.default.resolve(base, childPath));
       try {
         await io2.mkdirP(import_path5.default.resolve(base, childPath));
       } catch (err) {
@@ -160128,13 +160126,13 @@ async function diffSnapshots({
   }
   for (const absoluteFile of currentFiles) {
     const file = import_path5.default.relative(currentPath, absoluteFile);
-    console.log("Diff", { absoluteFile, file });
+    console.time(absoluteFile);
+    let isDiff = "unknown";
     currentSnapshots.add(file);
     if (baseSnapshots.has(file)) {
       const baseHead = import_path5.default.resolve(basePath, file);
       const branchHead = import_path5.default.resolve(currentPath, file);
       try {
-        let isDiff;
         if (mergeBaseSnapshots.has(file)) {
           console.log("CreateDiff:3way");
           isDiff = await multiCompare({
@@ -160172,7 +160170,7 @@ async function diffSnapshots({
     } else {
       newSnapshots.add(file);
     }
-    console.log("DiffDone", { absoluteFile, file });
+    console.timeEnd(absoluteFile);
   }
   missingSnapshots.forEach((file) => {
     if (mergeBaseFiles.length && !mergeBaseSnapshots.has(file)) {
