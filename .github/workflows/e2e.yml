@@ -48,10 +48,10 @@ jobs:
         run: |
           # Add custom bash assertions here to verify the action produced the expected diff files
           echo "Checking if results were generated..."
-          ls -la /tmp/e2e-results/visual-snapshots-results
+          ls -laR /tmp/e2e-results/
 
           # Example: Fail the test if no diff index.html was generated
-          if [ ! -f "/tmp/e2e-results/visual-snapshots-results/index.html" ]; then
+          if [ ! -f "/tmp/e2e-results/index.html" ]; then
             echo "Expected index.html was not generated!"
             exit 1
           fi
