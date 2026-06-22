@@ -56,12 +56,17 @@ async function run(): Promise<void> {
   // Forks do not have `pull_requests` populated...
   const workflowRunPullRequest = workflowRunPayload?.pull_requests?.[0];
 
-  const headSha = pullRequestPayload?.head.sha || workflowRunPullRequest?.head.sha || workflowRunPayload?.head_sha;
+  const headSha =
+    pullRequestPayload?.head.sha ||
+    workflowRunPullRequest?.head.sha ||
+    workflowRunPayload?.head_sha ||
+    github.context.sha;
   const headRef =
     pullRequestPayload?.head.ref ||
     workflowRunPullRequest?.head.ref ||
     (workflowRunPayload?.head_branch &&
-      `${workflowRunPayload?.head_repository?.full_name}/${workflowRunPayload?.head_branch}`);
+      `${workflowRunPayload?.head_repository?.full_name}/${workflowRunPayload?.head_branch}`) ||
+    github.context.ref;
 
   // TODO: Need a good merge base for forks as neither of the below values will exist (input not included)
   const mergeBaseSha: string =
