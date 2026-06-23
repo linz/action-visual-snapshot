@@ -1,8 +1,8 @@
 import { promises as fs } from 'fs';
 import * as assert from 'node:assert/strict';
 import { describe, it, beforeEach } from 'node:test';
-import path from 'path';
 import os from 'os';
+import path from 'path';
 
 import { multiCompare } from './multiCompare.ts';
 
