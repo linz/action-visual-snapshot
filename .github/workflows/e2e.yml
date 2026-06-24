@@ -50,5 +50,9 @@ jobs:
         uses: ./
         with:
           snapshot-path: /tmp/mock-snapshots
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          artifact-name: e2e-test-snapshots
+          action-name: E2E Test Snapshots
+          results-path: /tmp/e2e-results
           storage-prefix: 's3://linz-basemaps-screenshot'
           storage-url: 'https://d25mfjh9syaxsr.cloudfront.net'
