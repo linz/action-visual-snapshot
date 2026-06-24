@@ -49,5 +49,6 @@ jobs:
         id: visual-snapshots-diff
         uses: ./
         with:
+          snapshot-path: /tmp/mock-snapshots
           storage-prefix: 's3://linz-basemaps-screenshot'
           storage-url: 'https://d25mfjh9syaxsr.cloudfront.net'
