@@ -7,6 +7,10 @@ on:
 jobs:
   e2e:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      checks: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -33,25 +37,16 @@ jobs:
             cp src/util/__fixtures__/imgs/base/acceptance/test.png /tmp/mock-snapshots/
           fi
 
+      - name: AWS Configure
+        uses: aws-actions/configure-aws-credentials@v4.0.1
+        with:
+          aws-region: ap-southeast-2
+          mask-aws-account-id: true
+          role-to-assume: ${{ secrets.AWS_ROLE_SCREENSHOT }}
+
       - name: Run Visual Snapshot Action
         id: visual-snapshots-diff
         uses: ./
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          snapshot-path: /tmp/mock-snapshots
-          artifact-name: e2e-test-snapshots
-          action-name: E2E Test Snapshots
-          results-path: /tmp/e2e-results
-
-      - name: Verify Results
-        if: github.event_name == 'pull_request'
-        run: |
-          # Add custom bash assertions here to verify the action produced the expected diff files
-          echo "Checking if results were generated..."
-          ls -laR /tmp/e2e-results/
-
-          # Example: Fail the test if no diff index.html was generated
-          if [ ! -f "/tmp/e2e-results/index.html" ]; then
-            echo "Expected index.html was not generated!"
-            exit 1
-          fi
+          storage-prefix: 's3://linz-basemaps-screenshot'
+          storage-url: 'https://d25mfjh9syaxsr.cloudfront.net'
