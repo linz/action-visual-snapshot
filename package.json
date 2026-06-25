@@ -1,6 +1,6 @@
 {
   "name": "@linz/action-visual-snapshot",
-  "version": "0.0.1",
+  "version": "2.2.0",
   "private": true,
   "description": "GitHub Action to diff images",
   "type": "module",
